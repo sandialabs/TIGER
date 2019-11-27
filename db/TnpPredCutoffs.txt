@@ -1,0 +1,49 @@
+IS110.curated	1.3e-63
+IS1380.curated	2.3e-224
+IS1_ORF1.original	3.2e-34
+IS1_ORF2.original	3.9e-40
+IS1_combined.curated	2e-6
+IS200_IS605.curated	1e-20	raised from original 4.2e-79 to include Ecoli PROKKA_01477
+IS21_ORF1.curated	1.8e-9
+IS21_ORF2.curated	1e-20	lowered from original 8.4e-10 due to 2 DnaC false positives in E.coli at 1e-14
+IS21_combined.original	1e-10	lowered from original 2e-6  due to DnaC false positive PROKKA_01403 in E.coli at 3.7e-08
+IS256.pfam	8.7e-1
+IS30.curated	1.7e-127
+IS3_IS150_ORF1.original	1e-4	lowered from original 5.4e3 to exclude 0.84 ABCtransporter PROKKA_03450
+IS3_IS150_ORF2.curated	2.4e-114
+IS3_IS150_combined.original	1e-4	lowered from original 2.7e2 to exclude 0.02 txn activator PROKKA_02962
+IS3_IS2_ORF1.curated	1.2e-83
+IS3_IS2_ORF2.curated	2.4e-114
+IS3_IS2_combined.curated	5.7e-6
+IS3_IS3_ORF1.curated	2.5e-11
+IS3_IS3_ORF1.original	2.5e-11
+IS3_IS3_ORF2.curated	7.9e-140
+IS3_IS3_combined.original	1e-4	lowered from original 3.3e2 to exclude 0.016 RpoN PROKKA_03295 and PROKKA_00511
+IS3_IS407_ORF1.curated	3e-44
+IS3_IS407_ORF2.curated	3.5e-135
+IS3_IS407_combined.original	3.9e-4
+IS3_IS51_ORF1.original	5.5e-24
+IS3_IS51_ORF2.curated	8.1e-205
+IS3_IS51_combined.original	5.4e-98
+IS4.original	1.3e-1
+IS481.original	4e-84
+IS5_IS1031.curated	1.2e-162
+IS5_IS427_combined.original	6.7e-11
+IS5_IS5.curated	4.2e-48
+IS5_IS903.curated	7.3e-155
+IS5_ISH1.curated	1.5e-216
+IS5_ISL2.curated	2.6e-129
+IS6.curated	4.1e-65
+IS630.original	2.7e-93
+IS66_ORF1.original	1.4e-32
+IS66_ORF2.original	3.4e2
+IS66_ORF3.curated	1.7e-299
+IS66_combined.original	1e-4	lowered from original 1.5e4 to exclude uup transporter evalue 0.0071
+IS91.curated	4.1e-216
+IS982.curated	3.5e-102
+IS982.original	3.5e-102
+ISAs1.curated	1e-40	raised from 4.1e-205 to include Ecoli fragments PROKKA_00722 and PROKKA_00724
+ISL3.curated	5e-95
+Tn3.curated	0
+Tn3.original	0
+Tn3.pfam	1.7e-156
