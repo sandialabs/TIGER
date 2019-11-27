@@ -30,9 +30,13 @@ The tab-separated fields of the one-line .tax file are:
 
 ## Sample calls to try with /testdata
 ```perl PATH/islander.pl -verbose genome.fa```
+
 ```perl PATH/comparator.pl -verbose -db /databases/blast/refseq_genomic -fasta genome.fa  # switch in your own path to refseq_genomic```
+
 ```perl PATH/resolve.pl mixed```
 
 ## Notes:
 before rerunning islander.pl: ```rm genome.stats```
-before rerunning comparator.pl: ```rm genome.island.nonoverlap.gff``` 
+
+before rerunning comparator.pl: ```rm genome.island.nonoverlap.gff```
+
