@@ -14,18 +14,18 @@ Perl Core: List::Util, File::Spec, Cwd, Getopt::Long
 Perl Noncore: IPC::Run3
 
 RUNNING
-Requires a .fa file and .tax file in the same folder with the same prefix, as at comparator/testdata
+Requires a genome.fa file and genome.tax file in the same folder, as at comparator/testdata
 The tab-separated fields of the one-line .tax file are: 
- 1. taxid
- 2. organism
- 3. Division;Phylum;Class;Order;Family;Genus;Species
- 4. Genetic code (see https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi)
+ 1. TaxID (from NCBI, else use dummy value)
+ 2. Organism
+ 3. Taxonomy, 7 semicolon-separated ranks (Division;Phylum;Class;Order;Family;Genus;Species)
+ 4. Genetic code (see https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi, usually 11)
  5. Nickname (short name for organism, eg Eco837 for the 837th E. coli genome)
 
 Sample calls to try with /testdata
 perl PATH/islander.pl -verbose genome.fa
-perl PATH/comparator.pl -verbose -db /databases/blast/refseq_genomic -fasta genome.fa  # switch in your own path to refseq_genomic
-perl PATH/resolve.pl mixed
+perl PATH/comparator.pl -verbose -db /databases/blast/refseq_genomic -fasta genome.fa  # Use your own path to refseq_genomic
+perl PATH/resolve.pl mixed > isles.gff
 
 Notes:
 before rerunning islander.pl: $ rm genome.stats 
