@@ -4,6 +4,8 @@ use List::Util qw(shuffle);
 use Cwd 'abs_path';
 # Todo: deal with final shorts; Eco645.13.LysR_substrate|Tnp_2 should be called Eco645.13.T as tandem
 
+my ($cutoff, $minIsle, $maxIsle, $criterion, $verbose) = (0.51, 2000, 200000, 'bestSupp', 1); 
+warn "Called '$0 @ARGV' on " . localtime . "\n" if $verbose;
 die "Usage: $0 mode[comp/islr/mixed]\nLaunch from within genome directory\n" unless @ARGV == 1;
 my %mode; if ($ARGV[0] eq 'comp') {%mode = (comp => 1)} elsif ($ARGV[0] eq 'islr') {%mode = (islr => 1)} else {%mode = (comp => 1, islr => 1)}
 
@@ -11,7 +13,6 @@ my $dir = abs_path($0); $dir =~ s/([^\/]+)$/bin/;
 #$mode{superpositive} = '';  # File with new names scores
 my ($nick, %isl, %ends, $endorder, %tandems, %seen, %tandemtypes, %ct, %rejects, %splits, %dnas, %draws, %segCts, %trnas, %rRNAoverlaps, %uniqIsles, %contexts, $org, %gnms, %tandCur, %serials);
 my (@dnaRA, %hskpEnrich, %fornEnrich, %stats, $in, %prevScores, %oldprevs, @order, @annots);
-my ($cutoff, $minIsle, $maxIsle, $criterion, $verbose) = (0.51, 2000, 200000, 'bestSupp', 1); 
 my (%is607, %supconfl, %skipInt, %litProv);
 my %aalookup = qw/Ala A Arg R Asn N Asp D Cys C Glu E Gln Q Gly G His H Ile I Ile2 J Leu L Lys K Met M Phe F Pro P Ser S Thr T Trp W Tyr Y Val V Pyl O SeC U tmRNA Z iMet B fMet B Sup X Undet ?/;
 
@@ -25,41 +26,36 @@ LoadIS607(); LoadTandemCurate();
 LoadRrnaOverlaps(); #die scalar(keys %rRNAoverlaps), " rRNA overlap dnas\n";
 Load_housekeep_enrich();
 if ($mode{islr}) {
- warn "Islander input\n" if $verbose; for my $file (qw/islander.gff/) {Islander($file)}
- warn EndCt(), " ends\n";
- warn "FreshTandem\n" if $verbose; FreshTandem();
+ for my $file (qw/islander.gff/) {Islander($file)}
+ EndCt();
+ FreshTandem();
 }
 if ($mode{comp}) {
- warn "Comparator input\n" if $verbose;
- for my $file (qw/genome.island.gff/) {Comparator($file)}
+ for my $file (qw/genome.island.merge.gff/) {Comparator($file)}
  #for my $file (qw/comparatorIn.gff islandCurate.gff/) {Comparator($file)}
- warn EndCt(), " ends\n";
+ EndCt();
 }
 if ($mode{comp} and $mode{islr}) {
- #warn "TrnaStepoverTest\n" if $verbose; TrnaStepoverTest();
- while (1) {my $change = TandemBuildTrna(); warn "TandemBuildTrna, $change changes\n"; last if $change == 0}
+ #TrnaStepoverTest();
+ while (1) {my $change = TandemBuildTrna(); last if $change == 0}
 }
 ReInt();
 if ($mode{comp} and $mode{islr}) {
- if (defined $mode{superpositive}) {my $superpos = Superpositives($mode{superpositive}); warn "Superpositives, $superpos\n"; exit}
+ if (defined $mode{superpositive}) {my $superpos = Superpositives($mode{superpositive}); exit}
  EndTrna();
- #my $ttot; for (keys %tandems) {$ttot += keys %{$tandems{$_}}} print "$ttot tandems\n";
- warn "TandemSplit(CompIslr)\n" if $verbose; TandemSplit('mixed');
- warn "TandemDeoverlap(CompIslr)\n" if $verbose; TandemDeoverlap('mixed');
+ my $ttot; for (keys %tandems) {$ttot += keys %{$tandems{$_}}} warn "$ttot tandems\n" if $verbose;
+ TandemSplit();
+ TandemDeoverlap('multi');
 }
-if ($mode{comp}) {warn "TandemBuildCompOnly\n" if $verbose; TandemBuildCompOnly();}  # Treat comps that didn't fit into islr tandems
-warn "TandemSplit\n" if $verbose; TandemSplit('mixed');  # All tandems
-warn "TandemDeoverlap\n" if $verbose; TandemDeoverlap('mixed');
-warn "Write\n" if $verbose; Write();
+if ($mode{comp}) {TandemBuildCompOnly()}  # Treat comps that didn't fit into islr tandems
+TandemSplit();  # All tandems
+TandemDeoverlap('multi');
+Write();
 
 # SUBROUTINES
 sub LoadTandemCurate {for (@{ReadFile("$dir/../db/tandems.curate")}) {chomp; my @f = split "\t"; $tandCur{$f[0]} = $f[1]}}
-#sub LoadTandemCurate {for (@{ReadFile("tandems.curate")}) {chomp; my @f = split "\t"; $tandCur{$f[0]} = $f[1]}}
 sub LoadIS607 {for (@{ReadFile("$dir/../db/is607.clade")}) {chomp; next unless /^([^\.]+)\.(Resolvase.*)/; $is607{$1}{$2} ++}}  # Tsc2.Resolvase.1
-#sub LoadIS607 {for (@{ReadFile("intFams/is607.clade")}) {chomp; next unless /^([^\.]+)\.(Resolvase.*)/; $is607{$1}{$2} ++}}  # Tsc2.Resolvase.1
 sub LoadSupConfl {my $i = 0; for (@{ReadFile("$dir/../db/raw.sup.conflict")}) {chomp; $i++; for (split /\s+/) {$supconfl{$_} = $i}}}  # Sfl26.24P:653765-677699(5)
-#sub LoadLit {for (@{ReadFile("")}) {my @f = split "\t"; $litProv{$f[3]} = $f[4]}}  # NC_012667.1 939189 958282 Vch4.19HYP PLE4
-#sub LoadSkipInt {for (@{ReadFile("")}) {/(\S+)\t(\S+)/; $skipInt{$1} = $2}}  # Ade1.PhageIntegrase.13  Integron
 sub LoadContexts {for (@{ReadFile("$dir/../db/contextnames.txt")}) {$contexts{$1} = $2 if /(\S+)\t(\S+)/}}
 sub Load_housekeep_enrich {
  for (@{ReadFile("$dir/../db/housekeep_enrich.txt")}) {$hskpEnrich{$1} = $2 if /(\S+)\t(\S+)/}
@@ -171,10 +167,11 @@ sub Superpositives {
    #exit;
   }
  }
- return scalar keys %superpos;
+ warn scalar(keys %superpos), " Superpositives\n"; exit;
 }
 
 sub Write {
+ warn "Write\n" if $verbose;
  my %outIsles;
  for my $dna (sort keys %tandems) {
   $dna =~ /^([^\.]+)/;
@@ -274,6 +271,7 @@ sub Write {
 }
 
 sub TandemBuildCompOnly {
+ warn "TandemBuildCompOnly\n" if $verbose;
  my ($mode) = ($_[0]); 
  for my $dna (keys %ends) {
   my %islands;
@@ -338,6 +336,7 @@ sub TandemBuildCompOnly {
 }
 
 sub TrnaStepoverTest {
+ warn "TrnaStepoverTest\n" if $verbose;
  for my $dna (keys %ends) {
   for my $tand (keys %{$tandems{$dna}}) {
    my $t = \%{$tandems{$dna}{$tand}};
@@ -378,6 +377,7 @@ sub TandemBuildTrna {  # Tandem count from Islander unchanged by Comp inclusion
   }
   for (keys %{$tandems{$dna}}) {$tandems{$dna}{$_}{power} = scalar(keys %{$tandems{$dna}{$_}{ends}})}
  }  # dna
+ warn "TandemBuildTrna, $change changes\n" if $verbose; 
  return $change;
 }
 
@@ -418,10 +418,11 @@ sub TandemTest {
 
 sub TandemDeoverlap {
  my ($mode) = ($_[0]); 
+ warn "TandemDeoverlap\n" if $verbose; 
  for my $dna (sort keys %tandems) {
   $dna =~ /^([^\.]+)/;
   my $d = $tandems{$dna};
-  if ($mode eq 'mixed') {@order = sort {
+  if ($mode eq 'multi') {@order = sort {
    $$d{$b}{bestSupp} <=> $$d{$a}{bestSupp} ||
    $$d{$a}{bestScore} <=> $$d{$b}{bestScore} ||
    $$d{$a}{questionable} <=> $$d{$b}{questionable} ||
@@ -431,10 +432,12 @@ sub TandemDeoverlap {
   elsif ($mode eq 'random') {@order = shuffle keys %{$tandems{$dna}}}
   for my $i (0 .. $#order) {
    my ($tand, $t) = ($order[$i], $tandems{$dna}{$order[$i]});
+   #$$t{rejected_by} = 'nospans', next unless $$t{spans};
    my $ci = ''; for (@{$$t{spans}}) {$ci .= "$$_{L}-$$_{R}," if $$_{source} eq 'Comparator,Islander'}
-   #print "$$t{id}, $$t{bestSupp}, $$t{bestScore}, $$t{spans}[0]{L}-$$t{spans}[-1]{R}, $$t{questionable}, $$t{power}\n";
+   #print scalar(@{$$t{spans}}), " $$t{id}, $$t{bestSupp}, $$t{bestScore}, $$t{spans}[0]{L}-$$t{spans}[-1]{R}, $$t{questionable}, $$t{power}\n";
    next if $$t{rejected_by};
    die "$$t{id} no bestSupport\n" unless defined $$t{bestSupp};
+   #die "$$t{spans}\n";   
    #next if $mode eq 'compSupport' and not $$t{sources}{Comparator};
    my @coords = ($$t{spans}[0]{L}, $$t{spans}[-1]{R});  # Termini of the trimmed tandem
    die "$$t{id} $coords[0] and $coords[1]\n" unless $coords[0] and $coords[1];
@@ -460,15 +463,17 @@ sub TandemDeoverlap {
 }
 
 sub TandemSplit {
+ warn "TandemSplit\n" if $verbose; 
  for my $dna (sort keys %tandems) {
   my $isleCt = 0;
   for (keys %{$tandems{$dna}}) {
    my ($tand, $t) = ($_, $tandems{$dna}{$_});
    next if $$t{spans};  # Skip previously processed
-   #print scalar(keys %{$$t{members}}), " members in $$t{id}\n";
+   #print scalar(keys %{$$t{members}}), " members in $$t{id}\n"; for (keys %{$$t{members}}) {print "$_\n";} print scalar(keys %{$$t{ends}}), " ends in $$t{id}\n";
    my ($L, @segments, %members, %coordpos, @coords, %supps, %segCt, @noInts, $noIntFlag, %cuts, @span, %usedTrna, @priorities);
-   for (sort {$a <=> $b} keys %{$$t{ends}}) {warn "No end $_ for $tand $dna\n" unless $ends{$dna}{$_}; push @coords, $_; $coordpos{$_} = $#coords; $supps{$#coords} = $ends{$dna}{$_}{supp};} # print "$tand $_\n"}
+   for (sort {$a <=> $b} keys %{$$t{ends}}) {warn "No end $_ for $tand $dna\n" unless $ends{$dna}{$_}; push @coords, $_; $coordpos{$_} = $#coords; $supps{$#coords} = $ends{$dna}{$_}{supp};} # print "$tand $_\n"
    for my $i (0..$#coords) {warn "test1: $dna $_ $i $#coords: @coords\n" unless defined $supps{$i}}
+   #for (@coords) {print "$_\n"}
    $$t{rejected_by} = ''; %{$$t{rejectees}} = ();
    for my $isle (sort {$a <=> $b} keys %{$$t{members}}) {
     my $m = $isl{$dna}{$isle};
@@ -742,7 +747,7 @@ sub EndCt {
  my $ct = 0;
  #for my $dna (sort keys %ends) {$ct += scalar keys %{$ends{$dna}}; for (keys %{$ends{$dna}}) {warn "$dna $_ $ends{$dna}{$_}{coord} $ends{$dna}{$_}{supp}\n"}}
  for my $dna (sort keys %ends) {$ct += scalar keys %{$ends{$dna}}}
- return $ct;
+ warn "$ct ends\n" if $verbose;
 }
 
 sub EndTrna {
@@ -767,7 +772,8 @@ sub TandemBuildLite {
  }
 }
 
-sub Islander { 
+sub Islander {
+ warn "Islander input $_[0]\n" if $verbose; 
  for (@{ReadFile($_[0])}) {
   next if /replicon=Plm/;
   chomp;
@@ -796,6 +802,7 @@ sub Islander {
 }
 
 sub FreshTandem {  # Separated from Islander because endL,endR may change during loading
+ warn "FreshTandem\n" if $verbose; 
  for my $dna (keys %isl) {
   for my $isle (keys %{$isl{$dna}}) {
    my $i = \%{$isl{$dna}{$isle}};
@@ -815,6 +822,7 @@ sub FreshTandem {  # Separated from Islander because endL,endR may change during
 }
 
 sub Comparator {
+ warn "Comparator input $_[0]\n" if $verbose;
  for (@{ReadFile($_[0])}) {
   # NC_017765.1	comparator	island	9930995	9936042	3	+	.	brief=5HYP|ykoV;len=5047;contextsum=HYP>/>ykoV;prefCoords=9930995,9936041;bitsum=5923;gnm=NZ_CP013219.1:8562516-8565515;q1=94.105:11502-14268(9928230-9930996)>8559973-8562766;q2=93.739:250-1398>9936041-9937167;crossover=2;int=PhageIntegrase.9:9931135-9932322;mid=9931728;side=L612;OL=9930995-9930996;OR=9936041-9936042;OU=8562763-8562766;mobQ1=;mobQ2=;IS=;ISoverlap=;transposon=;ISidentical=;context=//hypothetical_protein/Lintergene/3prime/752,/ykoV_2//Rintergene/5prime/697;origOrient=+;q1identity=94.105;q2identity=93.739;isleLseq=ATGCCCCGAACGATCTGGTCCGGCGCGATCTCCTTCGGCCTGGTCACGGTgcTTATCTAGATCTGCATCACGGGTGTGAGGCACGTGAGGTCAGGTTTCATT;unintSeq=ATGCCCCGAACGATCTGGTCCGGCGCGATCTCCTTCGACCTGGTCACGGTgcCGATCAATGTGGTCGGCGCGACTGAGGACCACAGCATCCACTTCCACCAG;isleRseq=AGGAGAGCGCTCCTGACCTGCACATTCGCGGACGACATCTAGATAAGCACgcCGATCAATGTGATCGGCACCACCGAGGACCACAGCATCCACTTCCACCAG;mean=3255.66666666667;SD=1886.08948768492;deltaint=140;foreign=3.45631636123481;housekeep=13.1361382343199;hypoth=0.240129377648896;delta_GC=-0.07055;dinuc=0.06655;FPscore=6.71216010418801e-08;project=89409;division=Bacteria;phylum=Actinobacteria;order=Actinobacteria;class=Streptomycetales;family=Streptomycetaceae;genus=Streptomyces;species=Streptomyces hygroscopicus;org=Streptomyces hygroscopicus subsp. jinggangensis 5008;taxid=1133850;gencode=11;replicon=Chr;qlen=15000;ints=PhageIntegrase.9,PhageIntegrase.10;
   next if /replicon=Plm/;
@@ -892,9 +900,9 @@ sub IntOverlap {
 
 sub IntList {
  my %intList;
- for (`cat $dir/../db/intsRaw2.gff`) {
+ for (`cat genome.gff`) {
   my @f = split "\t";
-  die "No annot for int $_\n" unless $f[8] =~ /annot=([^;]+)/;
+  next unless $f[8] =~ /annot=([^;]+)/;
   @{$intList{$f[0]}{$1}} = ($f[3], $f[4], int(($f[3]+$f[4])/2));  # Gene midpoint
  }
  return \%intList;

@@ -24,10 +24,10 @@ $prefix =~ s/\.f(ast|n)*a(\.gz)*$//;
 chdir $outfolder;
 my (%stats); 
 ReadTax();
-#die "$nickname $taxonomy\n";
 $nickname = "-nickname " . $nickname if $nickname;
+#die "'$nickname' '$taxonomy'\n";
 my ($extra) = (' '); $extra = $nickname if $nickname; 
-RunCommand("perl $dir/tater.pl -tax $tax -gencode $gencode $extra $verbose $force $prefix", "$prefix.gff"); # Prepare gff with tRNAs, integrases
+RunCommand("perl $dir/tater.pl -tax $tax -gencode $gencode $extra $verbose $force $prefix.fa", "$prefix.gff"); # Prepare gff with tRNAs, integrases
 if ($complete) {$extra = "-complete "} else {$extra = ' '}
 if ($virus) {$extra .= "-virus $virus "}
 RunCommand("perl $dir/dnaStats.pl $extra$force $verbose $prefix", "$prefix.stats"); # take stats and prepare DNA subfolders
