@@ -1,8 +1,8 @@
-# Comparator
-Regulated gene integrity revealed through precise mapping of genomic islands
+# TIGER
+The Integrative Genetic Elements Retriever: Regulated gene integrity revealed through precise mapping of genomic islands
 
 # INSTALLATION
-git clone https://github.com/sandialabs/Comparator.git
+git clone https://github.com/sandialabs/TIGER.git
 
 User should have a reference genome blast database available, such as refseq_genomic
 
