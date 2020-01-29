@@ -12,11 +12,12 @@ mkdir $dir; chdir $dir; mkdir 'trna';
 #`rm -r trna/rfind*`;
 unless (-f "trna/rfind.gff")   {$cmd = "perl $binpath/rfind.pl tmrna genome.fa trna &> trna/rfind.log";    warn "$cmd\n"; `$cmd`}
 unless (-f "trna/rfam.gff")    {$cmd = "perl $binpath/rfam.pl genome.fa trna &> trna/rfam.log";            warn "$cmd\n"; `$cmd`}
-unless (-f "trna/introns.gff") {$cmd = "perl $binpath/introns.pl genome.fa trna $tax &> trna/introns.log"; warn "$cmd\n"; `$cmd`}
+unless (-f "trna/introns.gff") {$cmd = "perl $binpath/introns.pl genome.fa $tax &> trna/introns.log"; warn "$cmd\n"; `$cmd`}
 unless (-f "trna/tmrna.gff")   {$cmd = "perl $binpath/tmrna.pl genome.fa trna $tax &> trna/tmrna.log";     warn "$cmd\n"; `$cmd`}
 unless (-f "trna/trna.gff")    {$cmd = "perl $binpath/trna.pl genome.fa trna $tax &> trna/trna.log";       warn "$cmd\n"; `$cmd`}
 #exit if -f "trna/ttm.gff";
-chdir 'trna'; mkdir 'anal';
+chdir 'trna';
+mkdir 'anal';
 `awk -F"\\t" '\$6 == 100 {print}' rfind.gff > anal/tmPure.gff`;
 my %support; my %supptype = (qw/cmscan rfam aragorn1.2.40 aragorn/);
 for (`intersectBed -nonamecheck -wo -f 0.1 -F 0.1 -e -s -a anal/tmPure.gff -b rfam.gff`, `intersectBed -nonamecheck -wo -f 0.1 -F 0.1 -e -s -a anal/tmPure.gff -b tmrna.gff`) {
@@ -33,6 +34,7 @@ for (`intersectBed -nonamecheck -wo -f 0.1 -F 0.1 -e -s -a anal/tmPure.gff -b rf
 `cat anal/TFalseTm anal/TFalseGpi | sort -k1,1 -k4,4n -k5,5rn | intersectBed -nonamecheck -v -a trna.gff -b stdin > anal/Tremain.gff`;
 `intersectBed -nonamecheck -wo -f 0.1 -F 0.1 -e -s -a anal/Tremain.gff -b anal/Tremain.gff | awk -F"\\t" '\$9 != \$18 \&\& \$6 <= \$15 {print}' | cut -f 1-9 | awk '{print \$0 "reject=better trna;"}' > anal/TFalseSelfoverlap`;
 #system "pwd; ls ../";
+#for (`cat ../genome.fa`) {if (/^>(\S+)/) {$entry = $1} else {chomp; $seqs{$entry} .= $_}}
 for (`cat ../genome.fa`) {if (/^>(\S+)/) {$entry = $1} else {chomp; $seqs{$entry} .= $_}}
 for (keys %seqs) {$lens{$_} = length $seqs{$_}}
 
