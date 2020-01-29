@@ -16,12 +16,13 @@ my $help = "$version\n$usage\n".
 	"-fL       Left Flank (override above)\n" .
 	"-fR       Right Flank (override above)\n" .
 	"-s        suppress header line (sequence only)\n" .
+	"-h        one-word header\n" .
 	"-ULU      Convert flankSEQflank to FLANKseqFLANK\n" .
 	"-n        Name\n" .
 	"Additional options: -version, -usage, -help";
 
 # ARGUMENTS
-my ( $infile, $record , $flank , $flankL , $flankR , $L , $R , $coord, $orient , $ulu , $name , $relax, $nohead );
+my ( $infile, $record , $flank , $flankL , $flankR , $L , $R , $coord, $orient , $ulu , $name , $relax, $nohead, $singlehead);
 die ("\n$help\n\n") unless (@ARGV > 0);
 my $verbose = 0 ;
 my $stdCommand = 0 ;
@@ -30,6 +31,7 @@ my $options_okay = GetOptions (
 	'e=s' => \$record,
 	'x' => \$relax,
 	's' => \$nohead,
+	'h' => \$singlehead,
 	'L=i' => \$L,
 	'R=i' => \$R,
 	'd=s' => \$orient,
@@ -66,7 +68,7 @@ while ( <IN> ) {
 		if ( not $relax and $record and $1 ne $record ) { next }
 		s/^>(\S+)// ;
 		$header = $_ ;
-		if ( $name ) { $header = ' ' . $name }
+		#if ( $name ) { $header = $name }
 		$collect = $1 ;
 		next ;
 	}
@@ -94,12 +96,14 @@ if ( $flankL ) {
 }
 print length ( $seq ) , " characters in final sequence\n" if $verbose ;
 if ( $ulu ) { $seq =~ tr/acgtACGTbdhkmrvyBDHKMRVYnN/ACGTacgtBDHKMRVYbdhkmrvyNn/ } 
-my $head = ">$collect:$L\-$R$header<\n";
+my $head = ">$collect:$L\-$R$header";
 if ( $orient and $orient =~ /^R/ ) {
 	$seq = Revcom ( $seq ) ;
 	$head = ">$collect:$R\-$L$header<\n" ;
 }
-unless ($nohead) {print $head}
+$head =~ s/ .*// if $singlehead;
+$head = ">$name" if $name;
+unless ($nohead) {print "$head\n"}
 print "$seq\n" ;
 
 sub Revcom {
