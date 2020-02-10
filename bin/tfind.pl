@@ -34,7 +34,6 @@ for (`intersectBed -nonamecheck -wo -f 0.1 -F 0.1 -e -s -a anal/tmPure.gff -b rf
 `cat anal/TFalseTm anal/TFalseGpi | sort -k1,1 -k4,4n -k5,5rn | intersectBed -nonamecheck -v -a trna.gff -b stdin > anal/Tremain.gff`;
 `intersectBed -nonamecheck -wo -f 0.1 -F 0.1 -e -s -a anal/Tremain.gff -b anal/Tremain.gff | awk -F"\\t" '\$9 != \$18 \&\& \$6 <= \$15 {print}' | cut -f 1-9 | awk '{print \$0 "reject=better trna;"}' > anal/TFalseSelfoverlap`;
 #system "pwd; ls ../";
-#for (`cat ../genome.fa`) {if (/^>(\S+)/) {$entry = $1} else {chomp; $seqs{$entry} .= $_}}
 for (`cat ../genome.fa`) {if (/^>(\S+)/) {$entry = $1} else {chomp; $seqs{$entry} .= $_}}
 for (keys %seqs) {$lens{$_} = length $seqs{$_}}
 

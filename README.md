@@ -31,15 +31,14 @@ The tab-separated fields of the one-line .tax file are:
  4. Genetic code (see https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi)
  5. Nickname (short name for organism, eg Eco837 for the 837th E. coli genome)
 
-## Sample calls to try with /testdata
-```perl PATH/islander.pl -verbose genome.fa```
+## Sample calls to try within /testdata (PATH: to TIGER installation; DB: to reference genome blast database)
+```perl PATH/islander.pl -verbose genome.fa &> islander.log```
 
-```perl PATH/comparator.pl -verbose -db /databases/blast/refseq_genomic -fasta genome.fa  # switch in your own path to refseq_genomic```
+```perl /projects/islands/tiger/TIGER/tiger.pl -verbose -db DB -fasta genome.fa &> tiger.log```
 
-```perl PATH/resolve.pl mixed > resolved.gff```
+```perl PATH/resolve.pl mixed > resolved.gff 2> resolved.log```
 
-```perl PATH/bin/typing.pl resolved.gff > islesFinal.gff```
-
+```perl PATH/bin/typing.pl resolved.gff &> typing.log```
 
 ## Notes:
 before rerunning islander.pl: ```rm genome.stats```

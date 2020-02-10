@@ -28,7 +28,7 @@ sub Tax {
 sub FindGenes {
  if (-f $circ) {open IN, $circ; $circ = 'C'; while (<IN>) {$circ = 'L', last if /^\S+\tlin/} close IN}
  mkdir 'trna'; chdir 'trna';
- RunCommand("perl $dir/bin/tfind.pl $tax ..", "ttm.gff"); 
+ RunCommand("perl $dir/bin/tfind.pl $tax ..", "ttm.fa"); 
  mkdir '../protein'; chdir '../protein';
  my $kingdom = 'Bacteria'; $kingdom = 'Archaea' if $tax =~ /^A/;
  $nickname = '--locustag ' . $nickname if $nickname;
