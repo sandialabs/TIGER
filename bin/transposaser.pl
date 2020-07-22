@@ -1,11 +1,12 @@
 #! /usr/bin/perl
 use strict; use warnings;
 # Takes existing .gff and reindexes for a subregion
-use 5.10.0; use Cwd 'abs_path';
+use 5.10.0;
+use File::Spec;
 
 open (OUT, "> transposase.txt");
 die "usage: perl $0 IslandFile\n" unless @ARGV == 1;
-my $dir = abs_path($0); $dir =~ s/\/[^\/]+$//;
+my $dir = File::Spec->rel2abs($0); $dir =~ s/\/[^\/]+$//;
 my $infile = $ARGV[0];
 for (`cat $infile`) {
  my @f = split "\t";

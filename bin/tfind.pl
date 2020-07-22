@@ -1,20 +1,19 @@
 #! /usr/bin/perl
 use strict; use warnings;
-use Cwd 'abs_path';
+use File::Spec;
 
 die "Usage: perl $0 tax directory\ndirectory must contain file called genome.fa\n" unless @ARGV == 2;  # Autodetect tax
 my ($tax, $dir, $binpath) = (@ARGV, $0);
-for ($dir, $binpath) {$_ = abs_path($_)}
+for ($dir, $binpath) {$_ = File::Spec->rel2abs($_)}
 $binpath =~ s/\/([^\/]+)$//;
 #die "$dir $tax\n";
 my (%bads, %badrfams, %seqs, $entry, %lens, $cmd, %struct);
 mkdir $dir; chdir $dir; mkdir 'trna';
-#`rm -r trna/rfind*`;
-unless (-f "trna/rfind.gff")   {$cmd = "perl $binpath/rfind.pl tmrna genome.fa trna &> trna/rfind.log";    warn "$cmd\n"; `$cmd`}
-unless (-f "trna/rfam.gff")    {$cmd = "perl $binpath/rfam.pl genome.fa trna &> trna/rfam.log";            warn "$cmd\n"; `$cmd`}
-unless (-f "trna/introns.gff") {$cmd = "perl $binpath/introns.pl genome.fa $tax &> trna/introns.log"; warn "$cmd\n"; `$cmd`}
-unless (-f "trna/tmrna.gff")   {$cmd = "perl $binpath/tmrna.pl genome.fa trna $tax &> trna/tmrna.log";     warn "$cmd\n"; `$cmd`}
-unless (-f "trna/trna.gff")    {$cmd = "perl $binpath/trna.pl genome.fa trna $tax &> trna/trna.log";       warn "$cmd\n"; `$cmd`}
+$cmd = "perl $binpath/rfind.pl tmrna genome.fa trna &> trna/rfind.log"; RunCommand($cmd, "trna/rfind.gff");
+$cmd = "perl $binpath/rfam.pl genome.fa trna &> trna/rfam.log";         RunCommand($cmd, "trna/rfam.gff");
+$cmd = "perl $binpath/introns.pl genome.fa $tax &> trna/introns.log";   RunCommand($cmd, "trna/introns.gff");
+$cmd = "perl $binpath/tmrna.pl genome.fa trna $tax &> trna/tmrna.log";  RunCommand($cmd, "trna/tmrna.gff");
+$cmd = "perl $binpath/trna.pl genome.fa trna $tax &> trna/trna.log";    RunCommand($cmd, "trna/trna.gff");
 #exit if -f "trna/ttm.gff";
 chdir 'trna';
 mkdir 'anal';
@@ -120,4 +119,13 @@ sub Gff {
  @{$t{ends}} = @f[3,4]; @{$t{ends}} = @f[4,3] if $f[6] eq '-';
  while ($f[8] =~ s/^([^=]+)=([^;]*;)//g) {my $key = $1; $t{$key} = $2; $t{$key} =~ s/;//; push @{$t{ORDER}}, $key}  # ; print "$key='$t{$key}'\t'$f[8]'\n"}
  return \%t;
+}
+
+sub RunCommand {
+ my ($command, $checkfile) = @_;
+ if ($checkfile and -e $checkfile) {print "Skipping command: $command\n"; return}
+ print "Running command: $command\n";
+ my $out = system($command);
+ if ($out) {print "Command '$command' failed with error message $out\n"; exit}
+ else {print "Command '$command' succeeded\n"}
 }

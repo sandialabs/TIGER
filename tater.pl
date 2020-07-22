@@ -1,16 +1,16 @@
 #!/usr/bin/perl
 use strict; use warnings;
-use Cwd 'abs_path';
+use File::Spec;
 
 # OPTIONS
-my $dir = abs_path($0); $dir =~ s/\/([^\/]+)$//; my $scriptname = $1;
+my $dir = File::Spec->rel2abs($0); $dir =~ s/\/([^\/]+)$//; my $scriptname = $1;
 my ($verbose, $nickname, $force, $tax, $gencode, $extraDoms) = ('', '', '', '', '', '');
 my $circ = 'C';
 my $cpu = 1;
 my $hmm = "$dir/db/Pfam-A.hmm";
 Options(); # see bottom of script; help and other messages, Getopt
-my ($dna, $dnapath) = (abs_path($ARGV[0]), '.'); $dnapath = $1 if $dna =~ s/(.*\/)//; $dna =~ s/\.fa//;
-my @doms; for (split ',', $extraDoms) {push @doms, abs_path($_)}; $extraDoms = join(',', @doms);
+my ($dna, $dnapath) = (File::Spec->rel2abs($ARGV[0]), '.'); $dnapath = $1 if $dna =~ s/(.*\/)//; $dna =~ s/\.fa//;
+my @doms; for (split ',', $extraDoms) {push @doms, File::Spec->rel2abs($_)}; $extraDoms = join(',', @doms);
 $extraDoms = "-extraDoms $extraDoms" if $extraDoms;
 
 # PROGRAM
@@ -28,11 +28,12 @@ sub Tax {
 sub FindGenes {
  if (-f $circ) {open IN, $circ; $circ = 'C'; while (<IN>) {$circ = 'L', last if /^\S+\tlin/} close IN}
  mkdir 'trna'; chdir 'trna';
- RunCommand("perl $dir/bin/tfind.pl $tax ..", "ttm.fa"); 
+ RunCommand("perl $dir/bin/tfind.pl $tax .. &> tfind.log", "ttm.fa"); 
  mkdir '../protein'; chdir '../protein';
  my $kingdom = 'Bacteria'; $kingdom = 'Archaea' if $tax =~ /^A/;
  $nickname = '--locustag ' . $nickname if $nickname;
  RunCommand("prokka --rfam --prefix protein --locustag $dna --gcode $gencode --kingdom $kingdom --cpus $cpu --rnammer --notrna --outdir ./ --force --quiet $nickname ../$dna.fa", "protein.gff");
+ unlink qw/protein.err protein.ffn protein.fna protein.fsa protein.gbk protein.sqn protein.tbl protein.txt/;
  RunCommand("$dir/bin/hmmsearch --domtblout protein.domtbl --cpu $cpu --cut_tc $hmm protein.faa &> /dev/null", "protein.domtbl");
  RunCommand("perl $dir/bin/integrase_finder.pl -faa protein.faa -gff protein.gff -integron $dir/db/intI_Cterm.hmm -pfam $hmm -xer $dir/db/xers.prf -intDoms $dir/db/integrase_domain_pfams.txt -cpu $cpu $extraDoms $force $verbose", "protein.phage");
  RunCommand("$dir/bin/hmmsearch --tblout tnp.tbl --noali --cut_tc --cpu $cpu $dir/db/TnpPred_HMM_Profiles.hmm protein.faa &> /dev/null", "tnp.tbl");
@@ -44,7 +45,8 @@ sub RunCommand {
  if (not $force and ($checkfile and -e $checkfile)) {print "Skipping command: $command\n" if $verbose; return}
  print "Running command: $command\n" if $verbose;
  my $out = system $command;
- die "Command '$command' failed with error message $out\n" if $out;
+ if ($out) {die "Command '$command' failed with error message $out\n"}
+ else {print "Command '$command' succeeded\n"}
 }
 
 sub ReadFile {

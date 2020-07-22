@@ -1,7 +1,7 @@
 #! /usr/bin/perl
 use strict; use warnings;
 use List::Util qw(shuffle);
-use Cwd 'abs_path';
+use File::Spec;
 # Todo: deal with final shorts; Eco645.13.LysR_substrate|Tnp_2 should be called Eco645.13.T as tandem
 
 my ($cutoff, $minIsle, $maxIsle, $criterion, $verbose) = (0.51, 2000, 200000, 'bestSupp', 1); 
@@ -9,7 +9,7 @@ warn "Called '$0 @ARGV' on " . localtime . "\n" if $verbose;
 die "Usage: $0 mode[tiger/islander/mixed]\nLaunch from within genome directory\n" unless @ARGV == 1;
 my %mode; if ($ARGV[0] eq 'tiger') {%mode = (tiger => 1)} elsif ($ARGV[0] eq 'islander') {%mode = (islander => 1)} else {%mode = (tiger => 1, islander => 1)}
 
-my $dir = abs_path($0); $dir =~ s/([^\/]+)$/bin/;
+my $dir = File::Spec->rel2abs($0); $dir =~ s/([^\/]+)$/bin/;
 #$mode{superpositive} = '';  # File with new names scores
 my ($nick, %isl, %ends, $endorder, %tandems, %seen, %tandemtypes, %ct, %rejects, %splits, %dnas, %draws, %segCts, %trnas, %uniqIsles, %contexts, $org, %gnm, %tandCur, %serials, %rrna);
 my (@dnaRA, %hskpEnrich, %fornEnrich, %stats, $in, %prevScores, %oldprevs, @order, @annots);
@@ -42,7 +42,7 @@ ReInt();
 if ($mode{tiger} and $mode{islander}) {
  if (defined $mode{superpositive}) {my $superpos = Superpositives($mode{superpositive}); exit}
  EndTrna();
- my $ttot; for (keys %tandems) {$ttot += keys %{$tandems{$_}}} warn "$ttot tandems\n" if $verbose;
+ my $ttot = 0; for (keys %tandems) {$ttot += keys %{$tandems{$_}}} warn "$ttot tandems\n" if $verbose;
  TandemSplit();
  TandemDeoverlap('multi');
 }

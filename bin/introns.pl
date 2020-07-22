@@ -3,9 +3,9 @@ use strict; use warnings;
 # autocorrect aragorn miscall of anticodon loop with lower-casing of spliced.struct
 
 die "Usage: $0 fasta [AMG taxa]\n" if @ARGV < 1;
-use Cwd 'abs_path';
+use File::Spec;
 my ($file, $binpath) = ($ARGV[0], $0); 
-for ($file, $binpath) {$_ = abs_path($_); die "Can't find infasta\n" unless $_}
+for ($file, $binpath) {$_ = File::Spec->rel2abs($_); die "Can't find infasta\n" unless $_}
 my $dir = '.'; $dir = $1 if $file =~ /(.*)\/[^\/]$/;
 $binpath =~ s/\/([^\/]+)$//; my $scriptname = $1;
 my $lib = $binpath; $lib =~ s/[^\/]*$/db/;
@@ -33,8 +33,8 @@ for my $id (sort keys %final) {
  $n{$id}{seq} =~ s/$n{$id}{ttc}/$n{$id}{torig}/;
  $n{$id}{start} = 0 unless $n{$id}{start};
  #warn "$n{$id}{ttc}/$n{$id}{torig} $n{$id}{ttcold} $n{$id}{start} $id\n";
- if ($n{$id}{dir}  == 1) {$n{$id}{L} += $n{$id}{start}; $n{$id}{R} = $n{$id}{L} + length($n{$id}{seq})}
- else           {$n{$id}{R} -= $n{$id}{start}; $n{$id}{L} = $n{$id}{R} - length($n{$id}{seq})}
+ if ($n{$id}{dir}  == 1) {$n{$id}{L} += $n{$id}{start}; $n{$id}{R} = $n{$id}{L} + length($n{$id}{seq}) -1}
+ else           {$n{$id}{R} -= $n{$id}{start}; $n{$id}{L} = $n{$id}{R} - length($n{$id}{seq}) +1}
  $n{$id}{L} = 1 if $n{$id}{L} < 1;
  print FINAL join("\t", $n{$id}{dna}, qw/tfind tRNA_gpIintron/, @{$n{$id}}{qw/L R score ori/}, '.', "ID=$n{$id}{aa}.$n{$id}{splice_site};");
  for (qw/aa ac a_site j_site disc_fill disc_end iso iso_score introns note gpi_range gpi_L gpi_R gpi_score splice_site splice_score ivs_L ivs_R intron_length seq cca struct/)
@@ -147,7 +147,7 @@ sub Trna {
 
 sub Aragorn1 {
  warn "Finding split tRNA gene calls\n";
- system "$binpath/aragorn1.1 -w -t -l -i -seq -o introns.aragorn $file" unless -f "introns.aragorn";  # aragorn1.1
+ RunCommand("$binpath/aragorn1.1 -w -t -l -i -seq -o introns.aragorn $file", "introns.aragorn");  # aragorn1.1
  for (`cat introns.aragorn`) {
   if (/^>(\S+)/) {$dna = $1; $id = ''}
   elsif (/^T /) {$id = ''}
@@ -200,7 +200,7 @@ sub Presplice {
  close OUT;
  my ($start, $cca, $cut, $stop, $score, %p);
  my $call = "tRNAscan-SE -Q -q --thread 1 -f prespliced.struct $gencode -$tax --detail --brief prespliced.fa &> /dev/null" unless -f "prespliced.struct";
- unless (-f "prespliced.struct") {warn "$call\n"; system $call}
+ RunCommand($call, "prespliced.struct");
  for (`cat prespliced.struct`) {
   next unless /^\S/;
   chomp;
@@ -251,7 +251,7 @@ sub Tloop {
  }
  close OUT;
  my $call = "$binpath/aragorn1.2.40 -w -br -t -l -i -e -o preT.aragorn preT.fa";
- unless (-f "preT.aragorn") {warn "$call\n"; system $call}
+ RunCommand($call, "preT.aragorn");
  my ($seq, $ttc, $str, $torig, $ttcold);
  for (`cat preT.aragorn`) {
   chomp;
@@ -279,7 +279,7 @@ sub Aragorn2 {
  #tcccctgtagctcaatggtagagcggctcgctgttaacgagaaggttcgtggtccgagtccacgcgggggagcca
  #(((((((ss((((ddddddd))))s.((((ccAAAcc)))).vvvvv(((((ttttttt))))))))))))
  
- unless (-f "spliced.aragorn") {warn "$call\n"; system $call}
+ RunCommand($call, "spliced.aragorn");
  my (%t, $splice);
  for (`cat spliced.aragorn`) {
   chomp;
@@ -301,7 +301,7 @@ sub Aragorn2 {
 sub Scan {
  my (%t, $splice, $ttc);
  my $call = "tRNAscan-SE -Q -q --thread 1 -s spliced.iso -f spliced.struct -o spliced.out $gencode -$tax --detail --brief spliced.fa &> /dev/null";
- unless (-f "spliced.iso") {warn "$call\n"; system $call}
+ RunCommand($call, "spliced.iso");
  for (`cat spliced.struct`) {
   next unless /^\S/;
   chomp;
@@ -375,7 +375,7 @@ sub Acc {
 sub Introns {
  #my $cmd = "cmsearch --cpu 0 --tblout gpi.tbl $lib/cm/Intron_gpI.cm $file &> /dev/null";
  my $cmd = "cmsearch --cpu 0 --tblout gpi.tbl $lib/cm/gpi_bact_trna.cm $file &> /dev/null";
- unless (-s 'gpi.tbl') {warn "$cmd\n"; system $cmd}
+ RunCommand($cmd, 'gpi.tbl');
  warn "Can't find completed gpi.tbl\n" unless -s 'gpi.tbl';
  my @gpi;
  for (`cat gpi.tbl`) {
@@ -418,7 +418,7 @@ sub Ghost {
  }
  close OUT;
  my $call = "$binpath/aragorn1.1 -w -t -l -i -seq -o ghost.aragorn ghost.fa" unless -f "ghost.aragorn";  # aragorn1.1
- unless (-f "ghost.aragorn") {warn "$call\n"; system $call}
+ RunCommand($call, "ghost.aragorn");
  for (`cat ghost.aragorn`) {
   $id = $1 if /^>(\S+)/;
   next unless /^TI/;
@@ -432,3 +432,13 @@ sub Ghost {
   $n{$id}{seq} .= 'N' x $n{$id}{trunc_end} if $n{$id}{trunc_end};  # Ns improve tSE calls on truncations
  }
 }
+
+sub RunCommand {
+ my ($command, $checkfile) = @_;
+ if ($checkfile and -e $checkfile) {print "Skipping command: $command\n"; return}
+ print "Running command: $command\n";
+ my $out = system($command);
+ if ($out) {print "Command '$command' failed with error message $out\n"; exit}
+ else {print "Command '$command' succeeded\n"}
+}
+

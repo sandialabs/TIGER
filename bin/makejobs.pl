@@ -1,8 +1,9 @@
 #! /usr/bin/perl
 use strict; use warnings;
-use 5.10.0; use Cwd 'abs_path';
+use 5.10.0;
+use File::Spec;
 
-my $dir = abs_path($0); $dir =~ s/\/[^\/]+$//;
+my $dir = File::Spec->rel2abs($0); $dir =~ s/\/[^\/]+$//;
 
 for (glob "Isles/*"){
  next unless /(\S+)/;

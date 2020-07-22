@@ -1,6 +1,5 @@
 #! /usr/bin/perl
 use strict; use warnings;
-#use Cwd 'abs_path'; # Is this ever used?
 use File::Spec;
 #ToDo: refannot; enable search for group I&II introns using low minsize (150 bp?); annotate via uninterrupted; annotate broken target pfam
 
@@ -56,7 +55,8 @@ sub RunCommand {
  if (not $force and ($checkfile and -e $checkfile)) {print "Skipping command (product $checkfile exists): $command\n" if $verbose; return}
  print "Running command: $command\n" if $verbose;
  my $out = system($command);
- die "Command '$command' failed with error message $out\n" if $out;
+ if ($out) {die "Command '$command' failed with error message $out\n"}
+ else {print "Command '$command' succeeded\n"}
 }
 
 sub ReadFile {
@@ -69,13 +69,14 @@ sub ReadFile {
 
 sub ReadTax {
  $taxonomy = "division=;phylum=;order=;class=;family=;genus=;species=;org=;taxid=gencode=$gencode;";
- if (-f "$prefix.tax") {
-  my ($taxid, $org, $rank, $code, $nick) = split "\t", do { local( @ARGV, $/ ) = "$prefix.tax" ; <> }; $gencode = $code;
+ return unless -f "$prefix.tax";
+ for (`cat $prefix.tax`) {
+  chomp; my ($taxid, $org, $rank, $code, $nick) = split "\t";
+  $gencode = $code;
   my ($div, $phy, $ord, $cla, $fam, $gen, $spp) = split ';', $rank;
   $taxonomy = "division=$div;phylum=$phy;order=$ord;class=$cla;family=$fam;genus=$gen;species=$spp;org=$org;taxid=$taxid;gencode=$gencode;";
   $tax = 'B'; $tax = 'A' if $div eq 'Archaea'; $tax = 'M' if $gencode == 4; $tax = 'G' if $gencode == 25;
-  $nickname = $nick unless $nickname;
-  $nickname = '' unless $nickname; 
+  $nickname = $nick if $nick;
  }
 }
 

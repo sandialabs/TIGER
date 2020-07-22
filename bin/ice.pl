@@ -1,12 +1,13 @@
 #! /usr/bin/perl
 use strict; use warnings;
-use 5.10.0; use Cwd 'abs_path';
+use 5.10.0;
+use File::Spec;
 
 my ($nick, %l, %ICE, @ICE, @ICE_list, @other, @HYP, $ICEtot, $otherTot, $HYPtot, $perICE, $perHYP, $perother, $tot, $HYP_ICE, @ICEpfam);
 my ($ICEcall) = (0);
 
 die "Usage: perl $0 FastaFile\n" unless @ARGV >= 1;
-my $dir = abs_path($0); $dir =~ s/\/[^\/]+$//;
+my $dir = File::Spec->rel2abs($0); $dir =~ s/\/[^\/]+$//;
 my $file = $ARGV[0]; 
 die unless $file =~ /(\S+)\.[^\.]+$/;
 $nick = $1; 

@@ -1,10 +1,11 @@
 #! /usr/bin/perl
 use strict; use warnings;
-use 5.10.0; use Cwd 'abs_path';
+use 5.10.0;
+use File::Spec;
 
 die "Usage: perl $0 Island File\n" unless @ARGV == 1;
 my $study = $ARGV[0]; 
-my $dir = abs_path($0); $dir =~ s/\/[^\/]+$//;
+my $dir = File::Spec->rel2abs($0); $dir =~ s/\/[^\/]+$//;
 
 system "(mkdir Isles)"; 
 system "perl $dir/gff2fa.pl $study > isles.fa";

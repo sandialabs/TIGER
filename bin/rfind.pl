@@ -1,11 +1,11 @@
 #! /usr/bin/perl
 use strict; use warnings;
 use IPC::Run3 qw/run3/;
-use Cwd 'abs_path';
+use File::Spec;
 # todo: exclude curated pseudos, place in alignments, opp orient hard mask, insist on cod/acc hit
 
 die "Usage: $0 db infasta outdirectory\n" unless @ARGV == 3;
-my ($db, $infile, $outdir, $binpath) = ($ARGV[0], $ARGV[1], $ARGV[2], $0); for ($infile, $outdir, $binpath) {$_ = abs_path($_)}
+my ($db, $infile, $outdir, $binpath) = ($ARGV[0], $ARGV[1], $ARGV[2], $0); for ($infile, $outdir, $binpath) {$_ = File::Spec->rel2abs($_)}
 $binpath =~ s/\/([^\/]+)$//; my $scriptname = $1;
 my $lib = $binpath; $lib =~ s/[^\/]*$/db/; my $dbfiles = "$lib/$db/$db";
 die "No blast nucleotide database $db available in $dbfiles\n" unless -f "$dbfiles.nin";
@@ -27,7 +27,12 @@ for $round (1..10) {
   for (keys %inseqs) {$gnm .= ">$_\n$inseqs{$_}\n"}
   #open OUT, ">genome.$round.fa"; print OUT $gnm; close OUT;
   my $cmd = join(' ', @blastCmd); warn "$cmd\n"; 
-  run3(\@blastCmd, \$gnm, \@hits);
+  eval { run3 \@blastCmd, \$gnm, \@hits };
+  if    ( $@        ) { warn "Error: $@\n";                     }
+  elsif ( $? & 0x7F ) { warn "Killed by signal ".( $? & 0x7F ) . "\n"; }
+  elsif ( $? >> 8   ) { warn "Exited with error ".( $? >> 8 ) . "\n";  }
+  else                { warn "Completed successfully\n";          }
+  #run3(\@blastCmd, \$gnm, \@hits);
   warn scalar(@hits), " hits in round $round\n";
   #open OUT, ">hits.$round.blast"; print OUT join('', @hits); close OUT;
   for (@hits) {
@@ -40,7 +45,12 @@ for $round (1..10) {
   }
   for (sort {$$a[0] cmp $$b[0] || $$a[1] <=> $$b[1]} @beds) {$bed .= join("\t", @{$_}) . "\n";}
   open OUT, ">$round.bed"; print OUT $bed; close OUT;
-  run3(\@mergeCmd, \$bed, \@merges) if @hits;
+  eval { run3 \@mergeCmd, \$bed, \@merges };
+  if    ( $@        ) { warn "Error: $@\n";                     }
+  elsif ( $? & 0x7F ) { warn "Killed by signal ".( $? & 0x7F ) . "\n"; }
+  elsif ( $? >> 8   ) { warn "Exited with error ".( $? >> 8 ) . "\n";  }
+  else                { warn "Completed successfully\n";          }
+  #run3(\@mergeCmd, \$bed, \@merges) if @hits;
   open OUT, ">$db.$round.merge"; print OUT join('', @merges); close OUT;
  }
  my $ct = 0;

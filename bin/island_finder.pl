@@ -2,9 +2,9 @@
 use strict; use warnings;
 
 # OPTIONS
-use Cwd 'abs_path';
+use File::Spec;
 use List::Util qw(shuffle);
-my $dir = abs_path($0); $dir =~ s/\/([^\/]+)$//; my $scriptname = $1;
+my $dir = File::Spec->rel2abs($0); $dir =~ s/\/([^\/]+)$//; my $scriptname = $1;
 my $verbose;
 my $maxSize = 200000; # Maximum island size
 my $minSize =   2000;

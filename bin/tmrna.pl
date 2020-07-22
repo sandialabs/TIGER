@@ -2,8 +2,8 @@
 use strict; use warnings;
 
 die "Usage: $0 infasta outdir [AMG taxa]\n" if @ARGV < 1;
-use Cwd 'abs_path';
-my ($infile, $outdir, $binpath) = ($ARGV[0], $ARGV[1], $0); for ($infile, $outdir, $binpath) {$_ = abs_path($_)}
+use File::Spec;
+my ($infile, $outdir, $binpath) = ($ARGV[0], $ARGV[1], $0); for ($infile, $outdir, $binpath) {$_ = File::Spec->rel2abs($_)}
 $binpath =~ s/\/([^\/]+)$//; my $scriptname = $1;
 my $lib = $binpath; $lib =~ s/[^\/]*$/lib/;
 my ($tax, %gencode, %final, %t, $id, %serials, $dna, $collect) = ('B');
@@ -42,7 +42,7 @@ close FINAL;
 # SUBROUTINES
 sub Tmrna {
  #warn "Finding aragorn tmRNA gene calls\n";
- system "$binpath/aragorn1.2.40 -w -br -seq -e -m -l -o tmrna.aragorn $infile" unless -f "tmrna.aragorn";  # aragorn1.2.40
+ RunCommand("$binpath/aragorn1.2.40 -w -br -seq -e -m -l -o tmrna.aragorn $infile", "tmrna.aragorn");  # aragorn1.2.40
  for (`cat tmrna.aragorn`) {
   chomp;
   if (/^>(\S+)/) {$dna = $1; $id = ''}
@@ -131,3 +131,13 @@ sub Translate {  # Translate dna sequence into protein
  }
  return $pep;
 }
+
+sub RunCommand {
+ my ($command, $checkfile) = @_;
+ if ($checkfile and -e $checkfile) {print "Skipping command: $command\n"; return}
+ print "Running command: $command\n";
+ my $out = system($command);
+ if ($out) {print "Command '$command' failed with error message $out\n"; exit}
+ else {print "Command '$command' succeeded\n"}
+}
+

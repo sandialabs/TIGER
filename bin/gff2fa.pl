@@ -1,7 +1,7 @@
 #! /usr/bin/perl
 use strict; use warnings;
-use Cwd 'abs_path';
-my $dir = abs_path($0); $dir =~ s/\/[^\/]+$//;
+use File::Spec;
+my $dir = File::Spec->rel2abs($0); $dir =~ s/\/[^\/]+$//;
 
 die "Usage: perl $0 Island File\n" unless @ARGV == 1;
 for (`cat $ARGV[0]`) {

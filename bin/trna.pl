@@ -2,8 +2,8 @@
 use strict; use warnings;
 
 die "Usage: $0 infasta outdir [AMG taxa]\n" if @ARGV < 1;
-use Cwd 'abs_path';
-my ($infile, $outdir, $binpath) = ($ARGV[0], $ARGV[1], $0); for ($infile, $outdir, $binpath) {$_ = abs_path($_)}
+use File::Spec;
+my ($infile, $outdir, $binpath) = ($ARGV[0], $ARGV[1], $0); for ($infile, $outdir, $binpath) {$_ = File::Spec->rel2abs($_)}
 $binpath =~ s/\/([^\/]+)$//; my $scriptname = $1;
 my $lib = $binpath; $lib =~ s/[^\/]*$/lib/;
 my ($tax, $gencode, %anticodon2aa, %one_letter, %final, %t, $id, %serials, $dna, $collect) = ('B', '');
@@ -35,8 +35,7 @@ close FINAL;
 # SUBROUTINES
 sub Trna {
  my $call = "tRNAscan-SE -Q -q --thread 1 -f trna.struct -o trna.out $gencode -$tax --detail --brief $infile &> /dev/null";  # Also want -s base.iso, but not strictly necessary
- warn "$call\n";
- system $call unless -s "trna.out";  #  REMOVE Q and -s back to -f
+ RunCommand($call, 'trna.out');
  for (`cat trna.struct`) {
   next unless /^\S/;
   chomp;
@@ -103,3 +102,13 @@ sub LoadCode {
  %one_letter = (qw/Ala A Arg R Asn N Asp D Cys C Gln Q Glu E Gly G His H Ile I Ile2 I Leu L Lys K Met M Phe F Pro P SeC U Ser S
   Thr T Trp W Tyr Y Val V fMet B iMet B Sup * Undet X/);
 }
+
+sub RunCommand {
+ my ($command, $checkfile) = @_;
+ if ($checkfile and -e $checkfile) {print "Skipping command: $command\n"; return}
+ print "Running command: $command\n";
+ my $out = system($command);
+ if ($out) {print "Command '$command' failed with error message $out\n"; exit}
+ else {print "Command '$command' succeeded\n"}
+}
+

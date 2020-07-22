@@ -1,12 +1,13 @@
 #! /usr/bin/perl
 use strict; use warnings;
+use Cwd 'abs_path';
 # requires blast2.6 (gives accession.version form of subject)
 
 die "Usage: perl $0 genome.fasta entry coordinate genomeDB minisle maxisle maxoverlap queryLength1 queryLength2 mobtype\n" unless @ARGV == 10;
 my ($fa, $entry, $coord, $db, $minisle, $maxisle, $maxcross, $qlen1, $qlen2, $mobtype) = @ARGV; # min: 2000 for gi, 500 for is; max: 200000 for gi, 15000 for is; maxcross: 250 for gi, 30 for is
 my ($minhit, $max_seqs) = (500, 1000000);
 my (%sides, %isles, %reasons, $q1line, %actualQlen1, %xos);
-$db = '../' . $db unless $db =~ /^\//; # Correct relative path to db
+$db = abs_path($db);
 my $outdir = $entry; $outdir =~ s/^[a-z]+\|[0-9]+\|[a-z]+\|//; $outdir =~ s/\|.*//; $outdir .= ".$coord.$mobtype";
 
 system "makeblastdb -dbtype nucl -in $fa -out genome -parse_seqids > /dev/null" unless -f 'genome.nhr';
@@ -54,22 +55,25 @@ for my $side (qw/L R/) { # Process q1 blast hits; run and process q2 blast
   my ($L, $R) = ($start, $stop); if ($refstrand eq 'minus') {($L, $R) = ($R, $L)}
   if ($L < 1) {print FATE Fate('incomplete q2'); next}; # Sequence request exceeds L end of reference; save 'exceeds R end' for later
   push @batch, "$refname $L-$R $refstrand\n";
+  #die "$start-$stop, $q1line, $refdir, $refstrand, $refname" if $refname =~ /c524204/; #/UFOJ01000004.1/;
   %{$q1hits{$refname}} = (range => "$start-$stop", q1line => $q1line, refdir => $refdir, refstrand => $refstrand, refname => $refname);
  }
  unless (-f "q2$side.batch") {open BATCH, ">q2$side.batch"; print BATCH @batch; close BATCH}
  system "cat q2$side.batch | blastdbcmd -db $db -dbtype nucl -entry_batch - | sed ':a;N;/^>/M!s/\\n//;ta;P;D' |" . # Sed turns multi-line FastA entries to single-line
   "awk '!/^>/{next}{getline seq}length(seq)==$qlen2 {print \$0 \"\\n\" seq}' > q2$side.fa" unless -f "q2$side.fa";  # Awk removes entries ne $qlen2 (i.e., that exceed accession R end)
- for (`grep '^>' q2$side.fa`) {/^>(\S+)/; $q1hits{$1}{fa} ++}
- system "blastn -db ../genome -query q2$side.fa -outfmt 6 | grep $entry | awk '\$4 >= $minhit' | awk '\$7 < " . ($maxcross+3) . "' | sort -k1,1 -k12,12nr > q2$side.blast" unless -f "q2$side.blast"; # will warn "Warning: [blastn] Query is Empty!" if no q1 hits; not an error message to worry about
+ for (`grep '^>' q2$side.fa`) {/^>([^\s:]+)/; $q1hits{$1}{fa} ++}  
+ system "blastn -db ../genome -query q2$side.fa -outfmt 6 | grep $entry | awk '\$4 >= $minhit' | awk '\$7 < " . ($maxcross+3) . "' | sort -k1,1 -k12,12nr > q2$side.blast" unless -f "q2$side.blast";
+  # Above will warn "Warning: [blastn] Query is Empty!" if no q1 hits; not an error message to worry about
  for (`cat q2$side.blast`) { # Collect top hit for each q2
   chomp;
-  /^(\S+)/;
+  /^([^\s:]+)/;
   $q1hits{$1}{q2hit} = $_ unless $q1hits{$1}{q2hit}; # Keep only top hit
  }
+ #for (keys %q1hits) {print "$_\n"}; exit;
  mkdir "overlap";
- for my $q1 (sort keys %q1hits) { #print "$q1, ", join(',', keys %{$q1hits{$q1}}), "\n"; next;
+ for my $q1 (sort keys %q1hits) {#print "$q1, ", join(',', keys %{$q1hits{$q1}}), "\n"; next;
   # NZ_KE136876.1:563157-560158  NC_011745.1   100.00  2945    0       0       56      3000    3016097 3013153 0.0     5439
-  $q1line = $q1hits{$q1}{q1line};
+  $q1line = $q1hits{$q1}{q1line}; 
   die "$side $q1 $q1line\n" unless $q1line;
   unless ($q1hits{$q1}{fa}) {print FATE Fate('incomplete q2'); next} # q2 queries exceeding R end were omitted from faFile by awk filter, and not recorded in fa hash
   unless ($q1hits{$q1}{q2hit}) {print FATE Fate('no 1st-pass q2 hits'); next}
@@ -84,7 +88,11 @@ for my $side (qw/L R/) { # Process q1 blast hits; run and process q2 blast
   if ($islelen > $maxisle) {print FATE Fate('isle too long' ); next} # Reject if island too long
   if ($islelen < $minisle) {print FATE Fate('isle too short'); next}
   if ($crossover >= $maxcross) {
-   my ($L, $R, $proxM) = ($g[8] - $gnmdir * 2000, $g[8] + $gnmdir * ($crossover - 1), $coord - $gnmdir * ($actualQlen1{$side} - $f[7] + ($crossover - 1)/2)); # Distal overlap plus 2kb internal
+   my ($L, $R, $proxM) = (
+    $g[8] - $gnmdir * 2000,
+    $g[8] + $gnmdir * ($crossover - 1),
+    $coord - $gnmdir * ($actualQlen1{$side} - $f[7] + ($crossover - 1)/2)
+   ); # Distal overlap plus 2kb internal
    ($L, $R) = ($R, $L) if $L > $R; $L = 1 if $L<1; $R = $gnmlen if $R>$gnmlen;
    system "blastdbcmd -db ../genome -dbtype nucl -entry '$entry' -range $L-$R -strand $gnmstrand > overlap/$L-$R" unless -f "overlap/$L-$R";
    system "blastn -db ../genome -query overlap/$L-$R -outfmt 6 > overlap/$L-$R.genome" unless -f "overlap/$L-$R.genome";

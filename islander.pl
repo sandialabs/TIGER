@@ -2,8 +2,8 @@
 use strict; use warnings;
 
 # OPTIONS
-use Cwd 'abs_path';
-my $dir = abs_path($0); $dir =~ s/\/([^\/]+)$//; my $scriptname = $1;
+use File::Spec;
+my $dir = File::Spec->rel2abs($0); $dir =~ s/\/([^\/]+)$//; my $scriptname = $1;
 my ($verbose, $nickname, $complete, $force, $virus, $taxonomy) = ('', '', '', '', '', '');
 my ($outfolder, $prefix);
 my $invocation = "Called \"$0 @ARGV\" on " . localtime . "\n";
@@ -13,7 +13,7 @@ my $gencode = 11;
 my $criterion = 'score';
 Options(); # see bottom of script; help and other messages, Getopt
 print $invocation if $verbose;
-my $inDna = abs_path($ARGV[0]);
+my $inDna = File::Spec->rel2abs($ARGV[0]);
 die "No path for GENOME_FASTA_FILE $ARGV[0]\n" unless $inDna;
 if ($outfolder) {$prefix = $inDna; $prefix =~ s/.*\///}
 else {$outfolder = $inDna; $outfolder =~ s/([^\/]+)$//; $prefix = $1}
@@ -54,6 +54,7 @@ sub RunCommand {
  print "Running command: $command\n" if $verbose;
  my $out = system($command);
  if ($out) {print "Command '$command' failed with error message $out\n"; exit}
+ else {print "Command '$command' succeeded\n"}
 }
 
 sub ReadFile {

@@ -1,11 +1,12 @@
 #! /usr/bin/perl
 use strict; use warnings;
-use 5.10.0; use Cwd 'abs_path';
+use 5.10.0;
+use File::Spec;
 
 my (@phage_structure, @phage_funct, %l, @phage, @funct, @struct, $Stot, $Ftot, $nick, @sname, @fname);
 my ($phagecall) = (0);
 die "Usage: perl $0 FastaFile\n" unless @ARGV >= 1;
-my $dir = abs_path($0); $dir =~ s/\/([^\/]+)$//;
+my $dir = File::Spec->rel2abs($0); $dir =~ s/\/([^\/]+)$//;
 my $file = $ARGV[0]; 
 die unless $file =~ /(\S+)\.[^\.]+$/;
 $nick = $1; 

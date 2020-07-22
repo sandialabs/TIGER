@@ -1,17 +1,17 @@
 #! /usr/bin/perl
 use strict; use warnings;
 use IPC::Run3 qw/run3/;
-use Cwd 'abs_path';
+use File::Spec;
 
 die "Usage: $0 infasta outdirectory\n" unless @ARGV == 2;
-my ($db, $infile, $outdir, $dbfiles) = ('tmrna', $ARGV[0], $ARGV[1], $0); for ($infile, $outdir, $dbfiles) {$_ = abs_path($_)}
+my ($db, $infile, $outdir, $dbfiles) = ('tmrna', $ARGV[0], $ARGV[1], $0); for ($infile, $outdir, $dbfiles) {$_ = File::Spec->rel2abs($_)}
 $dbfiles =~ s/[^\/]*\/([^\/]+)$/db\/cm\/$db.cm/;
 # my $dbfiles = "$lib/cm/$db.cm";
 
 chdir $outdir;
 open FINAL, ">rfam.gff" or die "Cannot open outfile rfam.gff\n";
 mkdir 'rfam'; chdir 'rfam';
-system "cmscan -o /dev/null --cpu 0 --tblout tmrna.tbl --oskip --fmt 2 $dbfiles $infile" unless -f 'tmrna.tbl';
+RunCommand("cmscan -o /dev/null --cpu 0 --tblout tmrna.tbl --oskip --fmt 2 $dbfiles $infile", 'tmrna.tbl');
 
 my (@out, $serial);
 my %cm = qw/RF00023 tmRNA RF01849 alpha_tmRNA RF01850 beta_tmRNA RF01851 cyano_tmRNA/;
@@ -29,4 +29,13 @@ for (`cat tmrna.tbl`) {
 }
 @out = sort {$$a[0] cmp $$b[0] || $$a[3] <=> $$b[3] || $$b[4] <=> $$a[4]} @out;
 for (@out) {$serial ++; $$_[8] = "ID=rfam.$serial;" . $$_[8]; print FINAL join("\t", @{$_}), "\n"}
+
+sub RunCommand {
+ my ($command, $checkfile) = @_;
+ if ($checkfile and -e $checkfile) {print "Skipping command: $command\n"; return}
+ print "Running command: $command\n";
+ my $out = system($command);
+ if ($out) {print "Command '$command' failed with error message $out\n"; exit}
+ else {print "Command '$command' succeeded\n"}
+}
 

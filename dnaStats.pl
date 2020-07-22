@@ -2,8 +2,8 @@
 use strict; use warnings;
 
 # OPTIONS
-use Cwd 'abs_path';
-my $dir = abs_path($0); $dir =~ s/\/([^\/]+)$//; my $scriptname = $1;
+use File::Spec;
+my $dir = File::Spec->rel2abs($0); $dir =~ s/\/([^\/]+)$//; my $scriptname = $1;
 my ($verbose, $force, $complete, $virus, %virus) = (''. '', '', '');
 my $circularity = 'C';
 Options(); # see bottom of script; help and other messages, Getopt
@@ -123,7 +123,7 @@ sub Circularity {
 sub Gffs {
  my $gfftest = 0; for (keys %gff) {$gfftest ++ if $gff{$_}}
  unless ($gfftest) { # May have already collected during sub Stats
-  for (@{ReadFile("$dna.gff")}) {$gff{$1} .= $_ . "\n" if /^(\S+)/; $trna2dna{$2} = $1 if /^(\S+).*\ttm*RNA.*ID=([^;]+)/}
+  for (@{ReadFile("$dna.gff")}) {$gff{$1} .= $_ . "\n" if /^(\S+)/; $trna2dna{$2} = $1 if /^(\S+).*\ttm*RNA.*ID=([^;]+)/i}
  }
  for (@{ReadFile("protein/protein.domains.gff")}) {$dom{$1} .= $_ . "\n" if /^(\S+)/}
 }

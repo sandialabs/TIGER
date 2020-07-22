@@ -2,8 +2,8 @@
 use strict; use warnings;
 
 # OPTIONS
-use Cwd 'abs_path';
-my $dir = abs_path($0); $dir =~ s/\/([^\/]+)$//; my $scriptname = $1;
+use File::Spec;
+my $dir = File::Spec->rel2abs($0); $dir =~ s/\/([^\/]+)$//; my $scriptname = $1;
 my ($verbose, $faa, $gff, $intDoms, $integron, $pfam, $xer, $force);
 my $extraDoms = '';
 my $cpu = 1;
