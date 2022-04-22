@@ -9,9 +9,9 @@ git clone https://github.com/sandialabs/TIGER.git
 
 User should have a reference genome blast database available, such as refseq_genomic
 
-User should download Pfam-A.hmm from pfam (we currently use the version from July 2010) and place it or a symbolic link to it in the comparator/db directory
+User should download Pfam-A.hmm from pfam (we currently use the version from July 2010) and place it or a symbolic link to it in the TIGERPATH/db directory
 
-```ln -s /ABSOLUTE_PATH/Pfam-A.hmm comparator/db/Pfam-A.hmm```
+```ln -s /ABSOLUTE_PATH/Pfam-A.hmm TIGERPATH/db/Pfam-A.hmm```
 
 The following programs (with suggested versions) must be properly installed and in the user's path:
 * blastn, blastdbcmd, makeblastdb 2.6.0+
@@ -23,7 +23,7 @@ The following programs (with suggested versions) must be properly installed and 
 * Perl Noncore: IPC::Run3
 
 # RUNNING
-Requires a .fa file and .tax file in the same folder with the same prefix, as at comparator/testdata
+Requires a .fa file and .tax file in the same folder with the same prefix, as at TIGERPATH/testdata
 The tab-separated fields of the one-line .tax file are: 
  1. taxid
  2. organism
@@ -34,7 +34,7 @@ The tab-separated fields of the one-line .tax file are:
 ## Sample calls to try within /testdata (PATH: to TIGER installation; DB: to reference genome blast database)
 ```perl PATH/islander.pl -verbose genome.fa &> islander.log```
 
-```perl /projects/islands/tiger/TIGER/tiger.pl -verbose -db DB -fasta genome.fa &> tiger.log```
+```perl PATH/tiger.pl -verbose -db DB -fasta genome.fa &> tiger.log```
 
 ```perl PATH/resolve.pl mixed > resolved.gff 2> resolved.log```
 
@@ -43,5 +43,5 @@ The tab-separated fields of the one-line .tax file are:
 ## Notes:
 before rerunning islander.pl: ```rm genome.stats```
 
-before rerunning comparator.pl: ```rm genome.island.nonoverlap.gff```
+before rerunning tiger.pl: ```rm genome.island.nonoverlap.gff```
 
