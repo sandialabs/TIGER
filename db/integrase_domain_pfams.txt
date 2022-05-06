@@ -1,0 +1,18 @@
+PF00589 Phage_integrase Phage integrase family                  PHAGE
+PF02899 Phage_int_SAM_1 Phage integrase, N-terminal SAM-like domain                     PHAGE
+PF09003 Phage_integ_N   Bacteriophage lambda integrase, N-terminal domain               PHAGE
+PF14659 Phage_int_SAM_3 Phage integrase, N-terminal SAM-like domain                     PHAGE
+PF13102 Phage_int_SAM_5 Phage integrase SAM-like domain                                 PHAGE
+PF13356 DUF4102 Domain of unknown function (DUF4102)                                    PHAGE
+PF02920 Integrase_DNA   DNA binding domain of tn916 integrase                           PHAGE
+PF16795 Phage_integr_3  Archaeal phage integrase                                        PHAGE
+PF13495 Phage_int_SAM_4 Phage integrase, N-terminal SAM-like domain                             PHAGE
+PF07935 SSV1_ORF_D-335  ORF D-335-like protein                                  PHAGE
+PF11646 DUF3258 Protein of unknown function DUF3258                                     PHAGE
+PF12834 Phage_int_SAM_2 Phage integrase, N-terminal                                     PHAGE
+PF12835 Integrase_1     Integrase                                       PHAGE, related to PF00589
+PF13009 Phage_Integr_2  Putative phage integrase                PHAGE2, can neighbor partial PF00589
+PF14657 Integrase_AP2   AP2-like DNA-binding integrase domain                   PHAGE
+PF14882 PHINT_rpt	Phage-integrase repeat unit                                     PHAGE2
+PF12482 DUF3701 Phage integrase protein                                 PHAGE
+PF12167 DUF3596 Domain of unknown function (DUF3596)              PHAGE
