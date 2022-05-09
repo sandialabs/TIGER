@@ -33,11 +33,11 @@ The tab-separated fields of the one-line .tax file are:
  5. Nickname (short name for organism, eg Eco837 for the 837th E. coli genome)
 
 ## Sample calls to try within /testdata (PATH: to TIGER installation; DB: to reference genome blast database)
-```perl PATH/islander.pl -verbose genome.fa &> islander.log```
+```perl PATH/bin/islander.pl -verbose genome.fa &> islander.log```
 
-```perl PATH/tiger.pl -verbose -db DB -fasta genome.fa &> tiger.log```
+```perl PATH/bin/tiger.pl -verbose -db DB -fasta genome.fa &> tiger.log```
 
-```perl PATH/resolve.pl mixed > resolved.gff 2> resolved.log```  # Not yet updated for use with TIGER2
+```perl PATH/bin/resolve.pl mixed > resolved.gff 2> resolved.log```  # Not yet updated for use with TIGER2
 
 ```perl PATH/bin/typing.pl resolved.gff &> typing.log```  # Check with Katie
 
