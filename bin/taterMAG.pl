@@ -8,7 +8,7 @@ my ($verbose, $nickname, $force, $tax, $gencode, $extraDoms) = ('', '', '', '', 
 my $circ = 'C';
 my $cpu = 1;
 #my $hmm = "/projects/islands/Pfam-A.v35.hmm";
-my $hmm = "../bin/db/Pfam-A.v35.hmm";
+my $hmm = "../db/Pfam-A.v35.hmm";
 Options(); # see bottom of script; help and other messages, Getopt
 my ($dna, $dnapath) = (File::Spec->rel2abs($ARGV[0]), '.'); $dnapath = $1 if $dna =~ s/(.*\/)//; $dna =~ s/\.fa//;
 my @doms; for (split ',', $extraDoms) {push @doms, File::Spec->rel2abs($_)}; $extraDoms = join(',', @doms);
