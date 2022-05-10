@@ -14,8 +14,8 @@ for (glob "Isles/*"){
  $prefix =~ s/Isles\///; 
  $stripfix = $prefix; $stripfix =~ s/\.x$//; 
  my $head = substr($prefix, 0, 15); 
- print OUT "cd Isles/$prefix; perl $dir/iceMAG.pl $stripfix.fa; cd ../../;\n"; 
- print OUT "cd Isles/$prefix; perl $dir/phageMAG.pl $stripfix.fa; cd ../../;\n"; 
+ print OUT "cd Isles/$prefix; perl $dir/ice.pl $stripfix.fa; cd ../../;\n"; 
+ print OUT "cd Isles/$prefix; perl $dir/phage.pl $stripfix.fa; cd ../../;\n"; 
  if ($prefix =~ /\.x$/) {next} else {system "perl -pi -e 's/>\\S+/>$head/' Isles/$prefix/$prefix.fa; \n";}
 }
 close OUT; 

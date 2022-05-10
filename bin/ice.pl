@@ -14,7 +14,7 @@ $nick = $1;
 
 mkdir 'protein';
 system "$dir/hmmsearch --domtbl protein/${nick}_ICE.domtbl $dir/../db/ICE.hmm $file &> /dev/null";
-system "perl $dir/../taterMAG.pl -extraDoms protein/${nick}_ICE.domtbl $file" unless -f "$nick.gff";
+system "perl $dir/../tater.pl -extraDoms protein/${nick}_ICE.domtbl $file" unless -f "$nick.gff";
 
 for (`cat $dir/../db/ICEhmm.txt`){chomp; my @g = split "\t"; push @ICE_list, $g[0];}
 

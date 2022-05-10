@@ -12,7 +12,7 @@ my $file = $ARGV[0];
 die unless $file =~ /(\S+)\.[^\.]+$/;
 $nick = $1; 
 
-system("perl $dir/../taterMAG.pl $file") unless -f "$nick.gff";
+system("perl $dir/../tater.pl $file") unless -f "$nick.gff";
 
 for (`cat $dir/../db/PhageStructure.txt`){
  chomp; 

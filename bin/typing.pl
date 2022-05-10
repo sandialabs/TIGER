@@ -8,9 +8,9 @@ my $study = $ARGV[0];
 my $dir = File::Spec->rel2abs($0); $dir =~ s/\/[^\/]+$//;
 
 system "(mkdir Isles)"; 
-system "perl $dir/gff2faMAG.pl $study > isles.fa";
+system "perl $dir/gff2fa.pl $study > isles.fa";
 system "perl $dir/splitFa.pl";
-system "perl $dir/makejobsMAG.pl"; 
+system "perl $dir/makejobs.pl"; 
 system "bash job"; 
 #system "perl $dir/transposaser.pl $study"; 
 #system "perl $dir/selfblast.pl isles.fa > isles.invrep";
