@@ -21,37 +21,29 @@ for (`cat $ARGV[0]`) {
  $name =~ s/\,/x/g;
  $name =~ s/\(/x/g;
  $name =~ s/\)/x/g;
-($l{L}, $l{R}) = ($1, $2) if /endL=([^;]+).*endR=([^;]+)/; 
-if ($l{dir} =~ /-/) {$l{ori} = 'R'}
+ ($l{L}, $l{R}) = ($1, $2) if /endL=([^;]+).*endR=([^;]+)/; 
+ if ($l{dir} =~ /-/) {$l{ori} = 'R'}
+ #die "$l{compose}\n";
  if ($l{compose} eq 'simple'){
   my $cmd = "$dir/collectSeq.pl -h -i genome.fa -e $l{dna} -L $l{L} -R $l{R} -d $l{ori} -n $name";
   warn "$cmd\n";
   my $fa = `$cmd`;
-  print $fa;}
- else{
-system "mkdir Isles/$name.x";
-if (-r "Isles/$name.x/$name.fa") {next} 
-else {
-open OUT, ">>Isles/$name.x/$name.fa" or die "$name"; 
- my $head = substr($name, 0, 15);
-   %c = (dna1 => $l{coord}, dna2 => $l{coord}, L1 => $l{coord}, L2 => $l{coord}, R1 => $l{coord}, R2 => $l{coord}, dir1 => "F", dir2 => "F");
-   $c{dna1} =~ s/(Str_\d+_scaf\d+)\/\d+\-\d+\+.*/$1/;    
-   $c{L1} =~ s/Str_\d+_scaf\d+\/(\d+)\-\d+\+.*/$1/; 
-   $c{R1} =~ s/Str_\d+_scaf\d+\/\d+\-(\d+)\+.*/$1/;
-
-   #$c{dna1} =~ s/(\D+\d+\.\d*)\/\d+\-\d+\+.*/$1/;    
-   #$c{L1} =~ s/\D+\d+\.\d*\/(\d+)\-\d+\+.*/$1/; 
-   #$c{R1} =~ s/\D+\d+\.\d*\/\d+\-(\d+)\+.*/$1/;
-   my $cmd = "$dir/collectSeq.pl -h -i genome.fa -e $c{dna1} -c $c{L1}-$c{R1} -n L.${head}"; 
-   warn "$cmd\n"; my $fa = `$cmd`;print OUT $fa;
-   $c{dna2} =~ s/Str_\d+_scaf\d+\/\d+\-\d+\+(Str_\d+_scaf\d+)\/\d+\-\d+/$1/;
-   $c{L2} =~ s/Str_\d+_scaf\d+\/\d+\-\d+\+Str_\d+_scaf\d+\/(\d+)\-\d+/$1/;
-   $c{R2} =~ s/Str_\d+_scaf\d+\/\d+\-\d+\+Str_\d+_scaf\d+\/\d+\-(\d+)/$1/;
-
-   #$c{dna2} =~ s/\D+\d+\.\d*\/\d+\-\d+\+(\D+\d+\.\d*)\/\d+\-\d+/$1/;
-   #$c{L2} =~ s/\D+\d+\.\d*\/\d+\-\d+\+\D+\d+\.\d*\/(\d+)\-\d+/$1/;
-   #$c{R2} =~ s/\D+\d+\.\d*\/\d+\-\d+\+\D+\d+\.\d*\/\d+\-(\d+)/$1/;
-my $cmd2 = "$dir/collectSeq.pl -h -i genome.fa -e $c{dna2} -c $c{L2}-$c{R2} -n R.${head}";
-   warn "$cmd2\n"; my $fa = `$cmd2`;print OUT $fa;}
-close OUT;} 
+  print $fa;
+ }
+ else {
+  system "mkdir Isles/$name.x";
+  if (-r "Isles/$name.x/$name.fa") {next}
+  open OUT, ">>Isles/$name.x/$name.fa" or die "$name";
+  my $head = substr($name, 0, 15);
+  # coord=JDTM01000012.1/5168-1+JDTM01000010.1/40589-36807;
+  die "Can't parse coord $l{coord}\n" unless $l{coord} =~ /^([^\/]+)\/(\d+)-(\d+)\+([^\/]+)\/(\d+)-(\d+)/;
+  #die "$1 $2 $3 $4 $5 $6\n";
+  my $cmd  = "$dir/collectSeq.pl -h -i genome.fa -e $1 -c $2-$3 -n L.${head}";
+  my $cmd2 = "$dir/collectSeq.pl -h -i genome.fa -e $4 -c $5-$6 -n R.${head}";
+  warn "$cmd\n$cmd2\n";
+  my $fa1 = `$cmd`;
+  my $fa2 = `$cmd2`;
+  print OUT $fa1 . $fa2;
+  close OUT;
+ }
 }
