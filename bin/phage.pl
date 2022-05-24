@@ -4,13 +4,15 @@ use 5.10.0;
 use File::Spec;
 use List::MoreUtils 'true'; 
 
-my (@phage_structure, @phage_funct, %l, @phage, @funct, @struct, $Stot, $Ftot, $nick, @sname, @fname, @zot);
+my (@phage_structure, @phage_funct, %l, @phage, @funct, @struct, $Stot, $Ftot, $nick, $name, @sname, @fname, @zot);
 my ($phagecall) = (0);
 die "Usage: perl $0 FastaFile\n" unless @ARGV >= 1;
 my $dir = File::Spec->rel2abs($0); $dir =~ s/\/([^\/]+)$//;
-my $file = $ARGV[0]; 
-die unless $file =~ /(\S+)\.[^\.]+$/;
-$nick = $1; 
+my $file = $ARGV[0];
+$file = File::Spec->rel2abs($file);
+die unless $file =~ /([^\/]+)\/([^\/]+)\.[^\.]+$/;
+$name = $1;
+$nick = $2; 
 
 system("perl $dir/tater.pl $file") unless -f "$nick.gff";
 
@@ -47,8 +49,8 @@ elsif ($Ftot >= 1) {$phagecall = 3}
 
 open (OUT, "> phage.txt");
 print OUT "#nick\tstructTot\tnonStructTot\tphagecall\tstructural\tnonStruct\n";
-$nick =~ s/.*\///;
-print OUT "$nick\t$Stot\t$Ftot\t$phagecall\t", join(',', @sname), "\t", join(',', @fname), "\n";
+$name =~ s/.*\///;
+print OUT "$name\t$Stot\t$Ftot\t$phagecall\t", join(',', @sname), "\t", join(',', @fname), "\n";
 close (OUT);
 
 

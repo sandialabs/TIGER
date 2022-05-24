@@ -3,18 +3,20 @@ use strict; use warnings;
 use 5.10.0;
 use File::Spec;
 
-my ($nick, %l, %ICE, @ICE, @ICE_list, @other, @HYP, $ICEtot, $otherTot, $HYPtot, $perICE, $perHYP, $perother, $tot, $HYP_ICE, @ICEpfam);
+my ($nick, $name, %l, %ICE, @ICE, @ICE_list, @other, @HYP, $ICEtot, $otherTot, $HYPtot, $perICE, $perHYP, $perother, $tot, $HYP_ICE, @ICEpfam);
 my ($ICEcall) = (0);
 
 die "Usage: perl $0 FastaFile\n" unless @ARGV >= 1;
 my $dir = File::Spec->rel2abs($0); $dir =~ s/\/[^\/]+$//;
 my $file = $ARGV[0]; 
-die unless $file =~ /(\S+)\.[^\.]+$/;
-$nick = $1; 
+$file = File::Spec->rel2abs($file);
+die unless $file =~ /([^\/]+)\/([^\/]+)\.[^\.]+$/; 
+$nick = $2;
+$name = $1;
 
 mkdir 'protein';
-system "$dir/hmmsearch --domtbl protein/${nick}_ICE.domtbl $dir/../db/ICE.hmm $file &> /dev/null";
-system "perl $dir/tater.pl -extraDoms protein/${nick}_ICE.domtbl $file" unless -f "$nick.gff";
+system "$dir/hmmsearch --domtbl protein/${name}_ICE.domtbl $dir/../db/ICE.hmm $file &> /dev/null";
+system "perl $dir/tater.pl -extraDoms protein/${name}_ICE.domtbl $file" unless -f "$nick.gff";
 
 for (`cat $dir/../db/ICEhmm.txt`){chomp; my @g = split "\t"; push @ICE_list, $g[0];}
 
@@ -52,7 +54,7 @@ if ($len <= 10000){
 open (OUT, "> ICE.txt");
 print OUT "#nick\t\%ICE\t\%HYP\t\%other\tICEtot\tHYPtot\totherTot\ttot\tICEpfams\tICEcall\n";
 $nick =~ s/.*\///;
-print OUT "$nick\t$perICE\t$perHYP\t$perother\t$ICEtot\t$HYPtot\t$otherTot\t$tot\t", join(',', @ICEpfam), "\t$ICEcall\n"; 
+print OUT "$name\t$perICE\t$perHYP\t$perother\t$ICEtot\t$HYPtot\t$otherTot\t$tot\t", join(',', @ICEpfam), "\t$ICEcall\n"; 
 close (OUT);
 
 

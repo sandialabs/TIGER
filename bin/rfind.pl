@@ -27,6 +27,7 @@ for $round (1..10) {
   for (keys %inseqs) {$gnm .= ">$_\n$inseqs{$_}\n"}
   #open OUT, ">genome.$round.fa"; print OUT $gnm; close OUT;
   my $cmd = join(' ', @blastCmd); warn "$cmd\n"; 
+  next unless length($gnm) != 0; 
   eval { run3 \@blastCmd, \$gnm, \@hits };
   if    ( $@        ) { warn "Error: $@\n";                     }
   elsif ( $? & 0x7F ) { warn "Killed by signal ".( $? & 0x7F ) . "\n"; }
@@ -45,6 +46,7 @@ for $round (1..10) {
   }
   for (sort {$$a[0] cmp $$b[0] || $$a[1] <=> $$b[1]} @beds) {$bed .= join("\t", @{$_}) . "\n";}
   open OUT, ">$round.bed"; print OUT $bed; close OUT;
+  next unless length($bed) != 0;
   eval { run3 \@mergeCmd, \$bed, \@merges };
   if    ( $@        ) { warn "Error: $@\n";                     }
   elsif ( $? & 0x7F ) { warn "Killed by signal ".( $? & 0x7F ) . "\n"; }

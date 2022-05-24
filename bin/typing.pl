@@ -77,15 +77,15 @@ for (`cat $study`) {
 # $topSupp = $i{supp} unless $topSupp and $topSupp > $i{supp};
  push @outIsles, join("\t", @f[0..7]) . "\tID=$stripParenth;";
  $i{type} = ''; 
-   if ($i{phage} == '1' and $i{ice} == '1') {$i{type} = 'PhageICE'}
-   elsif ($i{phage} == '1' and $i{ice} == '2') {$i{type} = 'PhageICE'}
-   elsif (($i{phage} == '2' or $i{phage} == '3' or $i{phage} == '4') and ($i{ice} == '1')){$i{type} = 'ICE1'}
-   elsif (($i{phage} == '2' or $i{phage} == '3' or $i{phage} == '4') and ($i{ice} == '2')){$i{type} = 'ICE2'}
-   elsif ($i{phage} == '1'){$i{type} = 'Phage1'}
-   elsif ($i{phage} == '2' or $i{phage} == '3'){$i{type} = 'Phage2'}
-   elsif ($i{phage} == '4'){$i{type} = 'PhageFil'}
-   elsif ($i{ice} == '1'){$i{type} = 'ICE1'}
-   elsif ($i{ice} == '2'){$i{type} = 'ICE2'}
+   if ($i{phage} eq '1' and $i{ice} eq '1') {$i{type} = 'PhageICE'}
+   elsif ($i{phage} eq '1' and $i{ice} eq '2') {$i{type} = 'PhageICE'}
+   elsif (($i{phage} eq '2' or $i{phage} eq '3' or $i{phage} eq '4') and ($i{ice} eq '1')){$i{type} = 'ICE1'}
+   elsif (($i{phage} eq '2' or $i{phage} eq '3' or $i{phage} eq '4') and ($i{ice} eq '2')){$i{type} = 'ICE2'}
+   elsif ($i{phage} eq '1'){$i{type} = 'Phage1'}
+   elsif ($i{phage} eq '2' or $i{phage} eq '3'){$i{type} = 'Phage2'}
+   elsif ($i{phage} eq '4'){$i{type} = 'PhageFil'}
+   elsif ($i{ice} eq '1'){$i{type} = 'ICE1'}
+   elsif ($i{ice} eq '2'){$i{type} = 'ICE2'}
    else {$i{type} = 'other'}
  for (qw/supp intLongest compose coord crossover type phage ice source OLL OLR ORL ORR splice_site splice_site_type trna_dupe tRNA_len qStart qEnd bit_score
   context contextsum isleLseq unintSeq isleRseq gnm dirOnU OL OU OR division phylum order class family

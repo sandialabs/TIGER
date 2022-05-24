@@ -32,8 +32,8 @@ for (`cat $ARGV[0]`) {
  }
  else {
   system "mkdir Isles/$name.x";
-  if (-r "Isles/$name.x/$name.fa") {next}
-  open OUT, ">>Isles/$name.x/$name.fa" or die "$name";
+  if (-r "Isles/$name.x/genome.fa") {next}
+  open OUT, ">>Isles/$name.x/genome.fa" or die "$name";
   my $head = substr($name, 0, 15);
   # coord=JDTM01000012.1/5168-1+JDTM01000010.1/40589-36807;
   die "Can't parse coord $l{coord}\n" unless $l{coord} =~ /^([^\/]+)\/(\d+)-(\d+)\+([^\/]+)\/(\d+)-(\d+)/;
