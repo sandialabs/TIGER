@@ -37,9 +37,11 @@ The tab-separated fields of the one-line .tax file are:
 
 ```perl PATH/bin/tiger.pl -verbose -db DB -fasta genome.fa &> tiger.log```
 
+```perl PATH/bin/typing.pl genome.island.nonoverlap.gff &> typing.log```
+
 ```perl PATH/bin/resolve.pl mixed > resolved.gff 2> resolved.log```  # Not yet updated for use with TIGER2
 
-```perl PATH/bin/typing.pl resolved.gff &> typing.log```  # Check with Katie
+```perl PATH/bin/typing.pl resolved.gff &> typing.log```  # Use only when resolve.pl is updated
 
 ## Notes:
 before rerunning islander.pl: ```rm genome.stats```

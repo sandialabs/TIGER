@@ -31,6 +31,7 @@ for (`cat $nick.gff`){
  chomp; 
  next unless /\S+\t\S+\t\S+\t\S+\t\S+\t\S+\t\S+\t\S+/;
  my @f = split "\t";  
+ next unless f[2] eq 'CDS';
  %l = (dna => $f[0], type => $f[2], L => $f[3], R => $f[4], dir => $f[6]);
  while ($f[8] =~ s/^([^=;]+)=([^;]+);//g) {$l{$1} = $2};
  if ($l{pfam1} ~~ \@phage_structure) {push @struct, $l{ID}, push @sname, $l{pfam1}}

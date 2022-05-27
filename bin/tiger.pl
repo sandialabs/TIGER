@@ -559,7 +559,7 @@ sub BinarySearchAoH { # Array of hashes $aref numerically presorted by $$aref[$_
 }
 
 sub Options {
-my $version = '1.0 (Nov 2016)';
+my $version = '2.0 (May 2022)';
 #   '    |    '    |    '    |    '    |    '    |    '    |    '    |    '    |
 my $help = <<END;
 $scriptname version $version
