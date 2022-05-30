@@ -28,7 +28,7 @@ for (`cat $nick.gff`){
   while ($f[8] =~ s/^([^=;]+)=([^;]+);//g) {$l{$1} = $2};
   if ($l{pfam1} ~~ \@ICE_list) {push @ICE, $l{ID}; push @ICEpfam, $l{pfam1}}
    elsif ($l{rpt_family}){push @other, $l{rpt_family}}
-   elsif ($l{product} eq 'hypothetical protein'){push @HYP, $l{ID}}
+   elsif ($l{product} and $l{product} eq 'hypothetical protein'){push @HYP, $l{ID}}
    else {push @other, $l{ID}};  
   $ICEtot = scalar @ICE; 
   $otherTot = scalar @other; 

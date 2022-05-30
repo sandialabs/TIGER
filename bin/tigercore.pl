@@ -196,10 +196,10 @@ sub getSeq {
  my $begin = uc(substr($seq , 0 , length($seq)));
  my $middle = '';
  my $end = '';
- if (50 <= length(seq)) { $begin = uc(substr($seq, 0, 50)); }
- if ($crossover) { $middle = lc(substr($seq, 50, length(seq) - 50)); }
- if ($crossover and 50+$crossover <- length($seq)) { $middle = lc(substr($seq, 50, $crossover)); }
- if (50+$crossover <= length($seq)) { $end = uc(substr($seq, 50+$crossover, length($seq)-(50+$crossover)); }
+ if (50 <= length($seq)) { $begin = uc(substr($seq, 0, 50)); }
+ if ($crossover and 50 <= length($seq)) { $middle = lc(substr($seq, 50, length($seq) - 50)); }
+ if ($crossover and 50+$crossover <= length($seq)) { $middle = lc(substr($seq, 50, $crossover)); }
+ if (50+$crossover <= length($seq)) { $end = uc(substr($seq, 50+$crossover, length($seq)-(50+$crossover))); }
  if (100+$crossover <= length($seq)) { $end = uc(substr($seq, 50+$crossover, 50)) }
  my $markseq = $begin . $middle . $end . "\n";
  return $markseq;

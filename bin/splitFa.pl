@@ -3,6 +3,6 @@ for (`cat isles.fa`) {
   my $nick = $1;
   my $head = substr($nick, 0, 18);
  system ("mkdir Isles/$nick"); 
- open OUT, ">Isles/$nick/$nick.fa"}
+ open OUT, ">Isles/$nick/genome.fa"}
  print OUT $_;
 }
