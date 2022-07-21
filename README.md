@@ -5,6 +5,8 @@ Target / Integrative Genetic Element Retriever, version 2
 Mageeney CM, Lau BY, Wagner JW, Hudson CM, Schoeniger JS, Krishnakumar R and Williams KP. 2020. New candidates for regulated gene integrity revealed through precise mapping of integrative genetic elements. Nucleic Acids Research 48(8):4052-4065 (doi.org/10.1093/nar/gkaa156)
 Mageeney CM, Trubl G, Williams KP. 2022. Improved mobilome delineation in fragmented genomes. Front Bioinform doi: 10.3389/fbinf.2022.866850
 
+Mageeney CM, Trubl G, Williams KP. 2022. Improved mobilome delineation in fragmented genomes. Front Bioinform doi: 10.3389/fbinf.2022.866850
+
 # INSTALLATION
 git clone -b TIGER2 https://github.com/sandialabs/TIGER.git
 
