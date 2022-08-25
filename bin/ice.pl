@@ -10,9 +10,7 @@ die "Usage: perl $0 FastaFile\n" unless @ARGV >= 1;
 my $dir = File::Spec->rel2abs($0); $dir =~ s/\/[^\/]+$//;
 my $file = $ARGV[0]; 
 $file = File::Spec->rel2abs($file);
-die unless $file =~ /([^\/]+)\/([^\/]+)\.[^\.]+$/; 
-$nick = $2;
-$name = $1;
+die unless $file =~ /([^\/]+)\/([^\/]+)$/; ($name, $nick) = ($1, $2); $name =~ s/\.x//; $nick =~ s/\.fa//;
 
 mkdir 'protein';
 system "$dir/hmmsearch --domtbl protein/${name}_ICE.domtbl $dir/../db/ICE.hmm $file &> /dev/null";

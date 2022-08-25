@@ -1,8 +1,10 @@
 #!/usr/bin/perl
 use strict; use warnings;
 use File::Spec;
+use POSIX qw(strftime);
 
 # OPTIONS
+my $invoke = "Called on " . strftime("%Y-%m-%d/%H:%M:%S", localtime) . ". perl $0 @ARGV\n";
 my $dir = File::Spec->rel2abs($0); $dir =~ s/\/([^\/]+)$//; my $scriptname = $1;
 my $dbpath = $dir; $dbpath =~ s/[^\/]+$/db/;
 my ($verbose, $nickname, $force, $tax, $gencode, $extraDoms) = ('', '', '', '', '', '');
@@ -15,6 +17,7 @@ my @doms; for (split ',', $extraDoms) {push @doms, File::Spec->rel2abs($_)}; $ex
 $extraDoms = "-extraDoms $extraDoms" if $extraDoms;
 
 # PROGRAM
+warn $invoke if $verbose;
 chdir $dnapath;
 die "Can't find $dnapath/$dna.fa file\n" unless -e "$dna.fa";
 Tax();
@@ -31,10 +34,17 @@ sub FindGenes {
  mkdir 'trna'; chdir 'trna';
  RunCommand("perl $dir/tfind.pl $tax .. &> tfind.log", "ttm.fa"); 
  mkdir '../protein'; chdir '../protein';
+ open OUT, ">../temp.fa"; my (%origs, $n);  # Awkward! Change contig names (later restoring) in case too long for prokka
+ for (`cat ../$dna.fa`) {unless (/^>(\S+)/) {
+  print OUT $_; next} $n ++; my $pad = sprintf "%05d", $n; $origs{$pad} = $1; print OUT ">$pad\n"
+ }
+ close OUT;
  my $kingdom = 'Bacteria'; $kingdom = 'Archaea' if $tax =~ /^A/;
  $nickname = '--locustag ' . $nickname if $nickname;
- RunCommand("prokka --rfam --prefix protein --locustag $dna --gcode $gencode --kingdom $kingdom --cpus $cpu --rnammer --notrna --outdir ./ --force --quiet $nickname ../$dna.fa", "protein.gff");
+ RunCommand("prokka --rfam --prefix protein --locustag $dna --gcode $gencode --kingdom $kingdom --cpus $cpu --rnammer --notrna --outdir ./ --force --quiet $nickname ../temp.fa", "protein.gff");
  unlink qw/protein.err protein.ffn protein.fna protein.fsa protein.gbk protein.sqn protein.tbl protein.txt/;
+ open OUT, ">../temp.fa"; for (`cat protein.gff`) {print OUT $_ if s/(\S+)\t/$origs{$1}\t/} close OUT;
+ `mv ../temp.fa protein.gff`;
  RunCommand("$dir/hmmsearch --domtblout protein.domtbl --cpu $cpu --cut_tc $hmm protein.faa &> /dev/null", "protein.domtbl");
  RunCommand("perl $dir/integrase_finder.pl -faa protein.faa -gff protein.gff -integron $dbpath/intI_Cterm.hmm -pfam $hmm -xer $dbpath/xers.prf -intDoms $dbpath/integrase_domain_pfams.txt -cpu $cpu $extraDoms $force $verbose", "protein.phage");
  RunCommand("$dir/hmmsearch --tblout tnp.tbl --noali --cut_tc --cpu $cpu $dbpath/TnpPred_HMM_Profiles.hmm protein.faa &> /dev/null", "tnp.tbl");

@@ -10,9 +10,8 @@ die "Usage: perl $0 FastaFile\n" unless @ARGV >= 1;
 my $dir = File::Spec->rel2abs($0); $dir =~ s/\/([^\/]+)$//;
 my $file = $ARGV[0];
 $file = File::Spec->rel2abs($file);
-die unless $file =~ /([^\/]+)\/([^\/]+)\.[^\.]+$/;
-$name = $1; $name =~ s/\.x//;
-$nick = $2; 
+warn "$file\n";
+die unless $file =~ /([^\/]+)\/([^\/]+)$/; ($name, $nick) = ($1, $2); $name =~ s/\.x//; $nick =~ s/\.fa//;
 
 system("perl $dir/tater.pl $file") unless -f "$nick.gff";
 
