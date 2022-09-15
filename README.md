@@ -5,8 +5,6 @@ Target / Integrative Genetic Element Retriever, version 2
 Mageeney CM, Lau BY, Wagner JW, Hudson CM, Schoeniger JS, Krishnakumar R and Williams KP. 2020. New candidates for regulated gene integrity revealed through precise mapping of integrative genetic elements. Nucleic Acids Research 48(8):4052-4065 (doi.org/10.1093/nar/gkaa156)
 Mageeney CM, Trubl G, Williams KP. 2022. Improved mobilome delineation in fragmented genomes. Front Bioinform doi: 10.3389/fbinf.2022.866850
 
-Mageeney CM, Trubl G, Williams KP. 2022. Improved mobilome delineation in fragmented genomes. Front Bioinform doi: 10.3389/fbinf.2022.866850
-
 # INSTALLATION
 git clone -b TIGER2 https://github.com/sandialabs/TIGER.git
 
@@ -14,7 +12,7 @@ User should have a reference genome blast database available, such as refseq_gen
 
 User should download Pfam-A.hmm from pfam and place it or a symbolic link to it in the TIGERPATH/db directory
 
-```ln -s /ABSOLUTE_PATH/Pfam-A.hmm TIGERPATH/db/Pfam-A.hmm```
+```ln -s /ABSOLUTE_PATH/Pfam-A.hmm comparator/db/Pfam-A.hmm```
 
 The following programs (with suggested versions) must be properly installed and in the user's path:
 * blastn, blastdbcmd, makeblastdb 2.6.0+
@@ -26,7 +24,7 @@ The following programs (with suggested versions) must be properly installed and 
 * Perl Noncore: IPC::Run3
 
 # RUNNING
-Requires a .fa file and .tax file in the same folder with the same prefix, as at TIGERPATH/testdata
+Requires a .fa file and .tax file in the same folder with the same prefix, as at comparator/testdata
 The tab-separated fields of the one-line .tax file are: 
  1. taxid
  2. organism
