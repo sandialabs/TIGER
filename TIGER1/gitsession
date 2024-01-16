@@ -1,0 +1,160 @@
+10Feb2014:09:12blogin4:/projects/islands/tiger/TIGER$ git status
+# On branch master
+# Changes not staged for commit:
+#   (use "git add <file>..." to update what will be committed)
+#   (use "git checkout -- <file>..." to discard changes in working directory)
+#
+#	modified:   README.md
+#	modified:   bin/tfind.pl
+#	modified:   bin/tigercore.pl
+#	modified:   tater.pl
+#
+# Untracked files:
+#   (use "git add <file>..." to include in what will be committed)
+#
+#	bin/selfblast.pl
+#	prokka/
+no changes added to commit (use "git add" and/or "git commit -a")
+10Feb2014:09:22blogin4:/projects/islands/tiger/TIGER$ git diff tater.pl 
+diff --git a/tater.pl b/tater.pl
+index 2bd9730..3a0eeff 100755
+--- a/tater.pl
++++ b/tater.pl
+@@ -28,7 +28,7 @@ sub Tax {
+ sub FindGenes {
+  if (-f $circ) {open IN, $circ; $circ = 'C'; while (<IN>) {$circ = 'L', last if /^\S+\tlin/} close IN}
+  mkdir 'trna'; chdir 'trna';
+- RunCommand("perl $dir/bin/tfind.pl $tax ..", "ttm.gff"); 
++ RunCommand("perl $dir/bin/tfind.pl $tax ..", "ttm.fa"); 
+  mkdir '../protein'; chdir '../protein';
+  my $kingdom = 'Bacteria'; $kingdom = 'Archaea' if $tax =~ /^A/;
+  $nickname = '--locustag ' . $nickname if $nickname;
+10Feb2014:10:25blogin4:/projects/islands/tiger/TIGER$ git add bin tater.pl README.md 
+10Feb2014:11:38blogin4:/projects/islands/tiger/TIGER$ git status
+# On branch master
+# Changes to be committed:
+#   (use "git reset HEAD <file>..." to unstage)
+#
+#	modified:   README.md
+#	new file:   bin/selfblast.pl
+#	modified:   bin/tfind.pl
+#	modified:   bin/tigercore.pl
+#	modified:   tater.pl
+#
+# Untracked files:
+#   (use "git add <file>..." to include in what will be committed)
+#
+#	prokka/
+10Feb2014:11:44blogin4:/projects/islands/tiger/TIGER$ git commit -m "tigercore modified for simple fasta headers"
+
+*** Please tell me who you are.
+
+Run
+
+  git config --global user.email "you@example.com"
+  git config --global user.name "Your Name"
+
+to set your account's default identity.
+Omit --global to set the identity only in this repository.
+
+fatal: empty ident name (for <kpwilli@sandia.gov>) not allowed
+10Feb2014:12:59blogin4:/projects/islands/tiger/TIGER$ git config --global user.email kpwilli@sandia.gov
+10Feb2014:13:42blogin4:/projects/islands/tiger/TIGER$ git config --global user.name kpwilli
+10Feb2014:13:53blogin4:/projects/islands/tiger/TIGER$ 
+10Feb2014:13:54blogin4:/projects/islands/tiger/TIGER$ git commit -m "tigercore modified for simple fasta headers"
+[master ff62cb0] tigercore modified for simple fasta headers
+ 5 files changed, 55 insertions(+), 37 deletions(-)
+ create mode 100644 bin/selfblast.pl
+10Feb2014:13:59blogin4:/projects/islands/tiger/TIGER$ git status
+# On branch master
+# Your branch is ahead of 'origin/master' by 1 commit.
+#   (use "git push" to publish your local commits)
+#
+# Untracked files:
+#   (use "git add <file>..." to include in what will be committed)
+#
+#	prokka/
+nothing added to commit but untracked files present (use "git add" to track)
+10Feb2014:14:07blogin4:/projects/islands/tiger/TIGER$ git push
+warning: push.default is unset; its implicit value is changing in
+Git 2.0 from 'matching' to 'simple'. To squelch this message
+and maintain the current behavior after the default changes, use:
+
+  git config --global push.default matching
+
+To squelch this message and adopt the new behavior now, use:
+
+  git config --global push.default simple
+
+See 'git help config' and search for 'push.default' for further information.
+(the 'simple' mode was introduced in Git 1.7.11. Use the similar mode
+'current' instead of 'simple' if you sometimes use older versions of Git)
+
+Username for 'https://github.com': kpwilli
+Password for 'https://kpwilli@github.com': 
+remote: Invalid username or password.
+fatal: Authentication failed for 'https://github.com/sandialabs/TIGER.git/'
+10Feb2014:15:43blogin4:/projects/islands/tiger/TIGER$ git push
+warning: push.default is unset; its implicit value is changing in
+Git 2.0 from 'matching' to 'simple'. To squelch this message
+and maintain the current behavior after the default changes, use:
+
+  git config --global push.default matching
+
+To squelch this message and adopt the new behavior now, use:
+
+  git config --global push.default simple
+
+See 'git help config' and search for 'push.default' for further information.
+(the 'simple' mode was introduced in Git 1.7.11. Use the similar mode
+'current' instead of 'simple' if you sometimes use older versions of Git)
+
+Username for 'https://github.com': kpwilli
+Password for 'https://kpwilli@github.com': 
+remote: Invalid username or password.
+fatal: Authentication failed for 'https://github.com/sandialabs/TIGER.git/'
+10Feb2014:16:27blogin4:/projects/islands/tiger/TIGER$ git push
+warning: push.default is unset; its implicit value is changing in
+Git 2.0 from 'matching' to 'simple'. To squelch this message
+and maintain the current behavior after the default changes, use:
+
+  git config --global push.default matching
+
+To squelch this message and adopt the new behavior now, use:
+
+  git config --global push.default simple
+
+See 'git help config' and search for 'push.default' for further information.
+(the 'simple' mode was introduced in Git 1.7.11. Use the similar mode
+'current' instead of 'simple' if you sometimes use older versions of Git)
+
+Username for 'https://github.com': kpwilliams         
+Password for 'https://kpwilliams@github.com': 
+remote: Invalid username or password.
+fatal: Authentication failed for 'https://github.com/sandialabs/TIGER.git/'
+10Feb2014:17:28blogin4:/projects/islands/tiger/TIGER$ git push
+warning: push.default is unset; its implicit value is changing in
+Git 2.0 from 'matching' to 'simple'. To squelch this message
+and maintain the current behavior after the default changes, use:
+
+  git config --global push.default matching
+
+To squelch this message and adopt the new behavior now, use:
+
+  git config --global push.default simple
+
+See 'git help config' and search for 'push.default' for further information.
+(the 'simple' mode was introduced in Git 1.7.11. Use the similar mode
+'current' instead of 'simple' if you sometimes use older versions of Git)
+
+Username for 'https://github.com': kpwilliams
+Password for 'https://kpwilliams@github.com': 
+Counting objects: 14, done.
+Delta compression using up to 32 threads.
+Compressing objects: 100% (8/8), done.
+Writing objects: 100% (8/8), 1.90 KiB | 0 bytes/s, done.
+Total 8 (delta 6), reused 0 (delta 0)
+remote: Resolving deltas: 100% (6/6), completed with 6 local objects.
+To https://github.com/sandialabs/TIGER.git
+   680acdb..ff62cb0  master -> master
+
