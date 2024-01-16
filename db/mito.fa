@@ -1,0 +1,136 @@
+>Palpitomonas__bilix__1 loc=NC_031832.1/4996-4931;form=prmshort;sco=52.2;rfam=1-77;tax=Mitochondria,d__Eukaryota;tag=undetermined;
+AACATGGACCCGATGGCAGTATTCGGCTTCTCCAttttttatGGGGTAGAATAGGTTTGACATGTT
+>Seculamonas__ecuadoriensis__1 loc=NC_021128.1/39575-39477;form=prmshort;sco=48.4;rfam=1-77;tax=Mitochondria,d__Eukaryota,o__Jakobida;tag=undetermined;
+CGAATGGACCCATGGGCAGTTCATGGCATTCCCAgtaacaacatcagagtagtttttatattgttttaGGGAATGATATATACTAGAGATCGACATTCA
+>Andalucia__godoyi__1 loc=NC_021124.1/53120-53051;form=prmshort;sco=34.6;rfam=1-77;tax=Mitochondria,d__Eukaryota,o__Jakobida,f__Andaluciidae;tag=undetermined;
+AGAAAGGAACCGATCTCATCTTCGGCATTTCCAattctatctttcGGGAATGAATTGTTTTCGACTTTCT
+>Histiona__aroides__1 loc=NC_021125.1/63370-63446;form=prmshort;sco=52.4;rfam=1-77;tax=Mitochondria,d__Eukaryota,o__Jakobida,f__Histionidae;tag=undetermined;
+ACTATGGACCCGTGGGTGGAACACGGCATCTCCAggccctgctattttatgGGGGGTGTTAATAAATTCGACATAGT
+>Reclinomonas__americana__1 loc=NC_001823.1/62923-63007;form=prmshort;sco=74.7;rfam=1-77;tax=Mitochondria,d__Eukaryota,o__Jakobida,f__Histionidae;tag=undetermined;
+ACTATGGAACCGAGGGCGGATCTCGGCATCTCCAtaaaaatgtttgataacattttttGGGGATGTTTTTAGTATTCGACATAGT
+>Jakoba__libera__1 loc=NC_021127.1/67376-67275;form=stdshort;sco=26.5;rfam=1-77;tax=Mitochondria,d__Eukaryota,o__Jakobida,f__Jakobidae;tag=undetermined;
+GGGGATGAATTAGTTTAGATATTTAAGTAATCCATGAAAATTCATCAGAATTTTGTAATATTGCTTAGATAAAACCATGGGCAGTACATGGCATCTCCAttt
+>Imasa__heleensis__1 loc=NC_057511.1/694-812;form=prmshort;sco=38.4;rfam=1-77;tax=Mitochondria,d__Eukaryota,o__Malawimonadida,f__Imasidae;tag=undetermined;
+TGCATGGACCCGAAATTCAAACTTCGGTACCTCCAttacttatatgagtttatcccaaagatatctcaacaaaaagagaagagggtagacggagGGGGGTAATTCAGATTAGACATGCA
+>Paravannella__minima__1 loc=NC_040955.1/34877-34964;form=prmshort;sco=64.4;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Discosea,c__Flabellinia,f__Vannellidae;tag=undetermined;
+ATAATGGACCCAAAAGCTATTTTGGCATTTCCAtttttattgtattatagaaaatataaaaaGGGAATGAAATGAGATTTGACATTTT
+>Ancoracysta__twista__1 loc=NC_036491.1/41665-41771;form=prmshort;sco=54.0;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Nebulidia,c__Nebulidea,o__Nebulidida,f__Nebulidae;tag=undetermined;
+TTAATGGACCCGGGGGCAGAACCGGCACTTCCAttatacaaaataatacattttggctttaatattagctattgctgttcGGGAGTGATCTTAGTTTTAGACATTAA
+>Paralagenidium__karlingii__1 loc=NC_080886.1/39309-39379;form=prmshort;sco=83.9;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Lagenidiales;tag=undetermined;
+AGAATGGACCCAAAGGCAGTTTTTGGCATTTCCAaaaattaaaaaGGGAATGATAATAGTATTGACATTCT
+>Bremia__lactucae__1 loc=NC_040179.1/4133-4205;form=prmshort;sco=83.0;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+TAAATGGACTCGAGGGCAGTATTTGATATTTCCAttttaattaatagGGGGATAATAATAGAATTGACATTTA
+>Hyaloperonospora__arabidopsidis__1 loc=NC_063789.1/4139-4211;form=prmshort;sco=80.5;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+AAAATGGACCCATAGGCAGTTTTTGGTATTTCCTttttaatattaatGGGAATAATAATAGTGTTGACATTTT
+>Peronosclerospora__sorghi__1 loc=NC_070108.1/4153-4228;form=prmshort;sco=88.6;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+AAAATGGACCCAAAGGCAGTATTTGGTATTTCCAtttttttattatttatGGGAATAAAAAAAGAATTGACATTTT
+>Peronospora__belbahrii__1 loc=NC_063790.1/4141-4215;form=prmshort;sco=80.4;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+TTGATGGACCCAAAGGCAGTATTTGGTATTTCCAttttaaaaaattaatGGGGATAATAATAGAATTGACATTTT
+>Peronospora__tabacina__1 loc=NC_028331.1/4184-4256;form=prmshort;sco=78.4;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+TTAATGGACCCAAAGGCAGTATTTGGTATTTCCAttgttaaattaatGGGGATAATAATAGAATTGACATTTT
+>Phytophthora__agathidicida__1 loc=NC_056119.1/4148-4240;form=prmshort;sco=75.7;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+TAAATGGACTCAAAGGCAGTATTTGATATTTCCAtttattatttattaatttttaattaataaaaaaGGGAATAATAATAGAATTGACATTTA
+>Phytophthora__aleatoria__1 loc=NC_063812.1/4148-4220;form=prmshort;sco=90.4;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+TAAATGGACCCAAAGGCAGTATTTGGTATTTCCAttataattaataaGGGAATAATAAAAGAATTGACATTTA
+>Phytophthora__asparagi__1 loc=NC_067069.1/38115-38189;form=prmshort;sco=87.4;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+TAAATGGACCCAAAGGCAGTATTTGGTATTTCCAttttttaaattaagaGGGAATAAGAAAAGAATTGACATTTA
+>Phytophthora__botryosa__1 loc=NC_067065.1/22282-22208;form=prmshort;sco=87.8;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+AAAATGGACCCAAAGGCAGTATTTGGTATTTCCAtaattctaattaataGGGAATAATAATAGAATTGACATTTA
+>Phytophthora__cactorum__1 loc=NC_063791.1/4147-4226;form=prmshort;sco=84.6;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+TAAATGGACCCAAAGGCAGTATTTGGTATTTCCTttatatctaatatctaataaGGGAATAACAAAAGAATTGACATTTA
+>Phytophthora__capsici__1 loc=NC_063804.1/4160-4234;form=prmshort;sco=86.0;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+AAAATGGACCCAAAGGCAGTATTTGGTATTTCCAtattttaaattaataGGGAATAATACAAGAATTGACATTTA
+>Phytophthora__captiosa__1 loc=NC_056123.1/4141-4211;form=prmshort;sco=75.4;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+AAAATGGACCCAAAGGCGGTATTTGGTATTTCCAaattattaaataGGGGATAATAATGTATTGACATTTT
+>Phytophthora__castaneae__1 loc=NC_056120.1/4177-4271;form=prmshort;sco=74.8;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+TAAATGGACTCAAAGGCAGTATTTGATATTTCCAtttatattatttattaattaaaaattaataaataaGGGAATAAAAATAGAATTGACATTTA
+>Phytophthora__cinnamomi__1 loc=NC_063794.1/4156-4231;form=prmshort;sco=89.6;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+TAAATGGACCCAGAGGCAGTTTTTGGTATTTCCAtataaattaaatgactGGGGATAATAATAGAATTGACATTTA
+>Phytophthora__citrophthora__1 loc=NC_067066.1/20044-19970;form=prmshort;sco=88.8;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+AAAATGGACCCAAAGGCAGTATTTGGTATTTCCAtattgtaaattaataGGGAATAATAATAGAATTGACATTTA
+>Phytophthora__clandestina__1 loc=NC_067073.1/35775-35847;form=prmshort;sco=91.0;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+TAAATGGACCCAAAGGCAGTATTTGGTATTTCCAttaaatttaataaGGGGATAATAATAGAATTGACATTTA
+>Phytophthora__colocasiae__1 loc=NC_063795.1/4157-4225;form=prmshort;sco=71.2;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+AAAATGGACCCAAAGGCAGTATTTGGTATTTCCAaaaaatattcGGGAATAATAATGTATCGACATTTT
+>Phytophthora__cryptogea__1 loc=NC_063796.1/4140-4211;form=prmshort;sco=87.6;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+TAAATGAACCCAAAGGCAGTATTTGGTATTTCCAttaaaaattaaaGGGAATAATAATAGAATTGACATTTA
+>Phytophthora__fallax__1 loc=NC_056124.1/4130-4200;form=prmshort;sco=73.0;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+AAAATGGACCCAAAGGCAGTATTTGGTATTTCCAaattattaaataGGGGATGATAATGTATTGACATTTT
+>Phytophthora__fragariae__1 loc=NC_063814.1/4228-4304;form=prmshort;sco=97.5;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+TAAATGGACCCAAAGGCAGTATTTGGTATTTCCAtataaattaaataacatGGGGATAATTATAGAATTGACATTTA
+>Phytophthora__gonapodyides__1 loc=NC_067074.1/39007-39081;form=prmshort;sco=91.1;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+TAAATGGACCCGAAGGCAGTATTCGGTATTTCCAttattttaattaattGGGAATAATAATAGAATTGACATTTA
+>Phytophthora__hedraiandra__1 loc=NC_067067.1/34737-34809;form=prmshort;sco=87.6;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+TAAATGGACCCAAAGGCAGTATTTGGTATTTCCAttatatttaataaGGGAATAACAAAAGAATTGACATTTA
+>Phytophthora__heveae__1 loc=NC_056122.1/4183-4276;form=prmshort;sco=75.2;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+TATATGGACCCAAAGGCAGTATTTGGTATTTCCAtttattatttattaaattaaaaattaataaaataGGGGATAATAATAGAATTGACATTTA
+>Phytophthora__humicola__1 loc=NC_067071.1/33626-33700;form=prmshort;sco=91.9;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+TAAATGGACCCAAAGGCAGTATTTGGTATTTCCAttttttaaattaattGGGAATAATATTAGAATTGACATTTA
+>Phytophthora__ilicis__1 loc=NC_067072.1/21064-20990;form=prmshort;sco=77.0;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+TAAATGGACCCAAAAGCAATATTTGGTATTTCCAattatatattaaattGGGAATAATAATTGTATTGACATTTA
+>Phytophthora__infestans__1 loc=NC_015619.1/4176-4248;form=prmshort;sco=90.0;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+TAAATGGACCCAAAGGCGGTATTTGGTATTTCCAttaaatttaataaGGGAATAATAAAAGAATTGACATTTA
+>Phytophthora__kernoviae__1 loc=NC_063798.1/4134-4205;form=prmshort;sco=72.7;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+AAAATGGACCCAAAGGCAGTAGTTGGTATTTCCAaaatatttataGGGAATAATATTATGTATTGACATTTT
+>Phytophthora__lateralis__1 loc=NC_063799.1/4119-4196;form=prmshort;sco=86.3;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+TAAATGGACCCGAAGGCAGTATTTGGTATTTCCAtttattaatacgaaaataGGGGATAATATTAGAATTGACATTTA
+>Phytophthora__litchii__1 loc=NC_063792.1/4144-4221;form=prmshort;sco=90.9;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+TATATGGACCCAAAGGCAGTATTTGGTATTTCCAttaaatttaaattaataaGGGAATAATAATAGAATTGACATTTA
+>Phytophthora__megakarya__1 loc=NC_063810.1/4124-4198;form=prmshort;sco=86.8;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+TAAATGGACCCAAAGGCAGTATTTGGTATTTCCAttccatttaataaatGGGGATAATAAAAGAATTGACATTTA
+>Phytophthora__multivora__1 loc=NC_063800.1/4150-4224;form=prmshort;sco=87.6;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+AAAATGGACCCAAAGGCGGTATTTGGTATTTCCAtatctaaacttaataGGGAATAATAATAGAATTGACATTTA
+>Phytophthora__nicotianae__1 loc=NC_035725.1/4179-4251;form=prmshort;sco=91.0;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+TAAATGGACCCAAAGGCAGTATTTGGTATTTCCAttaatattaataaGGGAATAATAAAAGAATTGACATTTA
+>Phytophthora__palmivora__1 loc=NC_056125.1/4139-4213;form=prmshort;sco=85.3;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+CAAATGTACCCAAAGGCAGTATTTGGTATTTCCAttcattaatttaataGGGAATAATAATAGAATTGACATTTA
+>Phytophthora__pinifolia__1 loc=NC_063801.1/4144-4218;form=prmshort;sco=88.8;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+TAAATGGACCCGAAGGCAGTATTCGGTATTTCCAttattaaaattaatcGGGAATAATAGTAGAATTGACATTTA
+>Phytophthora__plurivora__1 loc=NC_067070.1/34346-34420;form=prmshort;sco=87.4;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+AAAATGGACCCAAAGGCAGTATTTGGTATTTCCAtatcttaaattaataGGGAATAATACTAGAATTGACATTTA
+>Phytophthora__pluvialis__1 loc=NC_063802.1/4155-4229;form=prmshort;sco=83.4;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+AAAATGGACCCAAGGGCAGTATTTGGTATTTCCActcattaaaataattGGGAATAATAATAGAATTGACATTTA
+>Phytophthora__polonica__1 loc=NC_029397.1/38005-38074;form=prmshort;sco=74.8;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+AAAATGGACCCAAAGGCAGTATTTGGTATTTCCAaaaaattattaGGGAATAATAAAGTATCGACATTTT
+>Phytophthora__pseudotsugae__1 loc=NC_067075.1/34327-34399;form=prmshort;sco=84.3;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+TAAATGGACCCAAAGGCAGTATTTGGTATTTCCAttatatctaataaGGGGATAACAAAAGAATTGACATTTA
+>Phytophthora__quercina__1 loc=NC_063806.1/4210-4284;form=prmshort;sco=89.1;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+TAAATGGACCCAAAGGCAGTATTTGGTATTTCCAtttattaagttaataGGGGATAATAAAAGAATTGACATTTA
+>Phytophthora__ramorum__1 loc=NC_009384.1/4120-4197;form=prmshort;sco=88.4;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+TAAATGAACCCAAAGGCAGTATTTGGTATTTCCAtttatttatattaaaataGGGGATAATATTAGAATTGACATTTA
+>Phytophthora__rubi__1 loc=NC_063807.1/4228-4304;form=prmshort;sco=96.9;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+TAAATGGACCCAAAGGCGGTATTTGGTATTTCCAtataaattaaataacatGGGGATAATTATAGAATTGACATTTA
+>Phytophthora__sansomeana__1 loc=NC_045089.1/4203-4276;form=prmshort;sco=89.4;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+TAAATGGACCCATAGGCAGTATTTGGTATTTCCAttaaaaaattaaaaGGGAATAATAATAGAATTGACATTTA
+>Phytophthora__sojae__1 loc=NC_009385.1/4170-4246;form=prmshort;sco=97.1;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+TAAATGGACCCAAAGGCAGTATTTGGTATTTCCAaataaattaaattataaGGGAATAAAATTAGAATTGACATTTA
+>Phytophthora__taxon__1 loc=NC_063803.1/4151-4225;form=prmshort;sco=87.2;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+TAAATGGACTCATAGGCAGTATTTGATATTTCCAtttattaaattaatcGGGAATAATAATAGAATTGACATTTA
+>Phytophthora__tropicalis__1 loc=NC_063793.1/4160-4234;form=prmshort;sco=88.3;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+AAAATGGACCCAAAGGCAGTATTTGGTATTTCCAtattttaaattaataGGGAATAATACTAGAATTGACATTTA
+>Phytophthora__tubulina__1 loc=NC_063808.1/4211-4285;form=prmshort;sco=90.5;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+TAAATGGACCCAAAGGCAGTATTTGGTATTTCCAtttattaaattaataGGGGATAATAAAAGAATTGACATTTA
+>Phytophthora__versiformis__1 loc=NC_063809.1/4239-4313;form=prmshort;sco=89.2;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+TAAATGGACCCAAAGGCAGTATTTGGTATTTCCAtttattaagttaatgGGGAATAATAAAAGAATTGACATTTA
+>Plasmopara__halstedii__1 loc=NC_063805.1/4181-4257;form=prmshort;sco=85.2;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+TAAATGGACCCAAAGGCGGTATTTGGTATCTCCAttttaatttttaataaGGGGATAATAATAAGTGTTGACATTTA
+>Plasmopara__viticola__1 loc=NC_045922.1/4253-4323;form=prmshort;sco=80.9;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+GAGATGGACCCAAAGGCAGTATTTGGTATCTCCAtatttaataaaGGGGGTAATAAAAGAATTGACATCTC
+>Pseudoperonospora__cubensis__1 loc=NC_027859.1/4928-5001;form=prmshort;sco=77.5;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+TTTATGGACCCAAAGGCAGTATTTGGTATTTCCAttttcaatttttatGGGAATAATAACAGAATTGACATTTG
+>Pseudoperonospora__humuli__1 loc=NC_042478.1/4149-4222;form=prmshort;sco=78.7;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Peronosporales,f__Peronosporaceae;tag=undetermined;
+TTTATGGACCCAAAGGCAGTATTTGGTATTTCCAtttttaatttttatGGGAATAATAACAGAATTGACATTTG
+>Phytopythium__vexans__1 loc=NC_063815.1/30831-30900;form=prmshort;sco=87.5;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Pythiales,f__Pythiaceae;tag=undetermined;
+TAAATGGACCCAAAGGCAGTATTTGGTATTTCCAaaaaaaataaGGGAATAATAATAGAATTGACATTTA
+>Pythium__insidiosum__1 loc=NC_027966.1/42059-41988;form=prmshort;sco=78.4;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Pythiales,f__Pythiaceae;tag=undetermined;
+AAAATGAACCCAAAGGCAGTTTTTGGTATTTCCAttttttattttcGGGAATAACAATAGTATCGACATTTT
+>Pythium__ultimum__1 loc=NC_014280.1/20036-20115;form=prmshort;sco=88.1;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Pythiales,f__Pythiaceae;tag=undetermined;
+GAAATGGACCCAAAGGCGGTATTTGGTATTTCCAtataaactaattaatacGGGAATAATTATATAAGAATTGACATTTT
+>Achlya__hypogyna__1 loc=NC_022178.1/35299-35240;form=prmshort;sco=34.8;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Saprolegniales,f__Saprolegniacea;tag=undetermined;
+ATAATGGACCCGATATTAAATTCGGTATCTCCAaataaGGGGATAAAATTTCGACATTAA
+>Saprolegnia__ferax__1 loc=NC_005984.1/37491-37549;form=prmshort;sco=35.9;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Saprolegniales,f__Saprolegniaceae;tag=undetermined;
+ATAATGTACCCAATTTAAAAATTGGTATTTCCAaaaaGGGAATAAATATTCGACATTAT
+>Saprolegnia__parasitica__1 loc=NW_012157837.1/15064-15122;form=prmshort;sco=34.6;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Saprolegniales,f__Saprolegniaceae;tag=undetermined;
+ATAATGTACCCAATTTAACAGTTGGTATTTCCAaaaaGGGAATAAATATTCGACATTAT
+>Thraustotheca__clavata__1 loc=NC_022179.1/41126-41192;form=prmshort;sco=48.9;rfam=1-77;tax=Mitochondria,d__Eukaryota,p__Oomycota,o__Saprolegniales,f__Saprolegniaceae;tag=undetermined;
+TAAATGGACCCAAATTAATTTTTTGGTATTTCCAaaataaaaaaaaGGGGATAATTTTCGACATTTA
