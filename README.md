@@ -12,7 +12,7 @@ User should have a reference genome blast database available, such as refseq_gen
 
 User should download Pfam-A.hmm from pfam and place it or a symbolic link to it in the TIGERPATH/db directory
 
-```ln -s /ABSOLUTE_PATH/Pfam-A.hmm comparator/db/Pfam-A.hmm```
+```ln -s /ABSOLUTE_PATH/Pfam-A.hmm PATH_TO_TIGER/db/Pfam-A.hmm```
 
 The following programs (with suggested versions) must be properly installed and in the user's path:
 * blastn, blastdbcmd, makeblastdb 2.6.0+
@@ -24,7 +24,8 @@ The following programs (with suggested versions) must be properly installed and 
 * Perl Noncore: IPC::Run3
 
 # RUNNING
-Requires a .fa file and .tax file in the same folder with the same prefix, as at comparator/testdata
+Requires a .fa file in the same folder with the same prefix.
+You may add a .tax file to specify what the genome is.
 The tab-separated fields of the one-line .tax file are: 
  1. taxid
  2. organism
@@ -36,13 +37,13 @@ The tab-separated fields of the one-line .tax file are:
 
 ```perl PATH/bin/islander.pl -verbose genome.fa &> islander.log```
 
-```perl PATH/bin/tiger.pl -verbose -db DB -fasta genome.fa &> tiger.log```
+```perl PATH/bin/tiger.pl -verbose -db DB -cross simple -fasta genome.fa &> tiger.log```
 
-```perl PATH/bin/typing.pl genome.island.nonoverlap.gff &> typing.log```
-
-```perl PATH/bin/resolve.pl mixed > resolved.gff 2> resolved.log```
+```perl PATH/bin/resolve.pl mixed lenient genome genome.island.merge.gff islander.gff &> resolve.log```
 
 ```perl PATH/bin/typing.pl resolved.gff &> typing.log```
+
+```perl PATH/bin/typing.pl genome.island.nonoverlap.gff &> typing.log```
 
 ## Notes:
 before rerunning islander.pl: ```rm genome.stats```
