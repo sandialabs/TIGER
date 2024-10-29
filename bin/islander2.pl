@@ -4,7 +4,7 @@ use strict; use warnings;
 # OPTIONS
 use File::Spec;
 my $dir = File::Spec->rel2abs($0); $dir =~ s/\/([^\/]+)$//; my $scriptname = $1;
-my ($verbose, $nickname, $complete, $force, $virus, $taxonomy, $tateronly) = ('', '', '', '', '', '');
+my ($cross, $verbose, $nickname, $complete, $force, $virus, $taxonomy, $tateronly) = ('cross', '', '', '', '', '', '');
 my ($outfolder, $prefix);
 my $invocation = "Called \"$0 @ARGV\" on " . localtime . "\n";
 my $cpu = 1;
@@ -21,7 +21,7 @@ $prefix =~ s/\.f(ast|n)*a(\.gz)*$//;
 #die "$outfolder $prefix\n";
 
 # PROGRAM
-mkdir $outfolder unless (-e $outfolder);
+chdir $outfolder;
 my (%stats); 
 ReadTax();
 $nickname = "-nickname " . $nickname if $nickname;
@@ -31,9 +31,9 @@ RunCommand("perl $dir/tater.pl -tax $tax -gencode $gencode $extra $verbose $forc
 exit if $tateronly;
 if ($complete) {$extra = "-complete "} else {$extra = ' '}
 if ($virus) {$extra .= "-virus $virus "}
-RunCommand("perl $dir/dnaStats.pl $extra$force $verbose $prefix", "$prefix.stats"); # take stats and prepare DNA subfolders
+RunCommand("perl $dir/dnaStats2.pl $extra$force $verbose $prefix", "$prefix.stats"); # take stats and prepare DNA subfolders
 for (@{ReadFile("$prefix.stats")}) {$stats{$1} = $_ if /(\S+)/}
-for (keys %stats) {PerDna($_) unless $_ eq 'all'}
+Island();
 PrintFinal();
 
 # SUBROUTINES
@@ -67,21 +67,18 @@ sub ReadFile {
  close IN; chomp @ret; return \@ret;
 }
 
-sub PerDna { # Find islands
- my ($entry) = @_;
- chdir($entry); print "Changing to $entry directory\n" if $verbose;
- RunCommand("makeblastdb -in in.fa -out in -dbtype nucl > /dev/null", "in.nsq");
- RunCommand("blastn -query in.trna.fa -db in -outfmt 6 -dust no -task  blastn > in.trnablast", "in.trnablast");
- RunCommand("perl $dir/island_finder.pl in $prefix $nickname $verbose -criterion $criterion > in.islander.log", "in.islander.log");
- chdir('..');
+sub Island { # Find islands
+ RunCommand("makeblastdb -in $prefix.fa -out $prefix -dbtype nucl > /dev/null", "$prefix.nsq");
+ RunCommand("blastn -query $prefix.trna.fa -db $prefix -outfmt 6 -dust no -task  blastn > $prefix.trnablast", "$prefix.trnablast");
+ RunCommand("perl $dir/island_finder2.pl $prefix $nickname $verbose -criterion $criterion -cross $cross > island_finder2.log", "island_finder2.logbreak");
+ RunCommand("perl $dir/merge.pl $prefix.island.gff island $prefix $nickname", "$prefix.island.nonoverlap.gff");
 }
 
 sub PrintFinal {
  my %serials;
- open OUT, ">$outfolder/islander.gff"; 
- for (keys %stats) {
-  next if $_ eq "all";
-  open IN, "$_/in.island.gff";
+ open OUT, ">islander.gff"; 
+ for (glob "islander.island.merge.gff") {
+  open IN, "$_";
   while (<IN>) {
    chomp;
    next unless /;name=([^;]+)/;
@@ -90,6 +87,7 @@ sub PrintFinal {
    $name .= $serials{$name} if $serials{$name} > 1;
    s/ID=[^;]+/ID=$name/;
    s/;name=([^;]+)//;
+   s/;side=;/;/;
    print OUT $_ . $taxonomy . "\n";
   }
   close IN;
@@ -116,7 +114,8 @@ Usage: perl $scriptname [options] GENOME_FASTA_FILE
   -gencode:   Genetic code table (see NCBI). Default: $gencode.
   -nickname:  Brief name for genome (as might be used to start a locus_tag).
   -criterion: Basis for overlap resolution, 3 options: random, score (7-test
-               false positive formula), deltaGC. Default = $criterion.
+               false positive formula), deltaGC. Default: $criterion.
+  -cross:     Three options: intact, cross, or circleOrigin. Default: $cross.
   -virus:     Comma-separated list of entries assigned as viruses.
   -complete:  Consider genome complete and categorize replicons. Default:
                consider genome incomplete and call all entries contigs.
@@ -148,6 +147,7 @@ my $options_okay = GetOptions(
  'gencode=i'   => \$gencode,
  'tax=s'       => \$tax,
  'nickname=s'  => \$nickname,
+ 'cross=s'     => \$cross,
  'criterion=s' => \$criterion,
  'virus'       => \$virus,
  'tateronly'   => \$tateronly,

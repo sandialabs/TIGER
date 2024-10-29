@@ -110,8 +110,8 @@ for my $side (qw/L R/) { # Process q1 blast hits; run and process q2 blast
    $islelen = abs($prox - $halves[0]) + abs($distal - $halves[1]);
   }
   if ($compos eq 'circlejxn') {
-   my ($L, $R) = sort {$a <=> $b} ($distal, $prox);
-   if ($L == 1 and $R == $gnmlens{$entry}) {print FATE Fate('wrap around'); next}
+   if ($prox == $distal) {print FATE Fate('wrap around'); next}
+   if ($mode eq "cross") {print FATE Fate('circleJxn in cross mode'); next}
   }
   if ($islelen > $maxisle) {print FATE Fate('isle too long' ); next} # Reject if island too long
   if ($islelen < $minisle) {print FATE Fate('isle too short'); next}
@@ -138,15 +138,22 @@ for my $side (qw/L R/) { # Process q1 blast hits; run and process q2 blast
    #if ($f[7]-$f[6]+1-$crossover < 50 or $g[7]-$crossover < 50) {print FATE Fate('ref match not extended at both ends'); next}
    # find biggest hit spanning proxL and that match to ref extends at least 50 bp beyond this, reset $crossover accordingly
   }
-  my ($proxL, $proxR, $refL, $refR, $distL, $distR) = ($coord - $gnmdir * ($actualQlen1{$side} - $f[7] + $crossover + 50 - 1),
-   $coord - $gnmdir * ($actualQlen1{$side} - $f[7] - 50), $f[9] - $refdir * ($crossover + 50 - 1),
-   $f[9] + $refdir * (50), $g[8] - $hitdir * 50, $g[8] + $hitdir * ($crossover + 50 - 1));
+  my ($proxL, $proxR, $refL, $refR, $distL, $distR) = (
+   $coord - $gnmdir * ($actualQlen1{$side} - $f[7] + $crossover + 50 - 1),
+   $coord - $gnmdir * ($actualQlen1{$side} - $f[7] - 50),
+   $f[9] - $refdir * ($crossover + 50 - 1),
+   $f[9] + $refdir * (50),
+   $g[8] - $hitdir * 50,
+   $g[8] + $hitdir * ($crossover + 50 - 1)
+  );
+  #warn "$f[1] $f[9] $crossover $refdir. $refL, $refR\n" if $f[1] eq 'KB946175.1';
   $proxL = 1 if $proxL < 1;
   $proxR = $gnmlens{$entry} if $proxR > $gnmlens{$entry};
-  $refL = 1 if $refL < 1;
-  $refR = $gnmlens{$entry} if $refR > $gnmlens{$entry};
+  #$refL = 1 if $refL < 1;
+  #$refR = $gnmlens{$entry} if $refR > $gnmlens{$entry};  # Wrong; should use length ref accn! Don't need costly get, $f[9] should be far from contig end 
   $distL = 1 if $distL < 1;
-  $distR = $gnmlens{$entry} if $distR > $gnmlens{$entry};
+  $distR = $gnmlens{$hitentry} if $distR > $gnmlens{$hitentry};
+  #warn "$f[1] $f[9] $crossover $refdir. $refL, $refR\n" if $f[1] eq 'KB946175.1';
 
   #if ($crossover > $maxcross) {
   # my $adjust = $crossover - $maxcross - 1;
@@ -167,6 +174,7 @@ for my $side (qw/L R/) { # Process q1 blast hits; run and process q2 blast
   $out .= getSeq($db,         $refname,  $refL,  $refR,  $refstrand, $crossover);
   $out .= getSeq('../genome', $hitentry, $distL, $distR, $hitstrand, $crossover);
   $outs{$islesum}{$out} = $bittot;
+  #die "$out\nL: $entry, $proxL, $proxR, $gnmstrand, $crossover\nRef: $db, $refname, $refL, $refR, $refstrand, $crossover\nR: $hitentry, $distL, $distR, $hitstrand\n" if $refname eq 'KB946175.1';
  }
  print OUT "# $side side of coordinate: $sides{$side} accessions hit; hit filtering fates:";
  for (sort {$reasons{$b} <=> $reasons{$a}} keys %reasons) {print OUT " '$_'=$reasons{$_};"} print OUT "\n";
