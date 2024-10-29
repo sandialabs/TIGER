@@ -4,17 +4,19 @@ use List::Util qw(shuffle);
 use File::Spec;
 # Todo: deal with final shorts; Eco645.13.LysR_substrate|Tnp_2 should be called Eco645.13.T as tandem
 
-my ($cutoff, $minIsle, $maxIsle, $criterion, $verbose) = (0.51, 2000, 200000, 'bestSupp', 1); 
+my ($cutoff, $maxIsle, $criterion, $verbose) = (0.51, 200000, 'bestSupp', 1); 
 warn "Called '$0 @ARGV' on " . localtime . "\n" if $verbose;
-die "Usage: $0 mode[tiger/islander/mixed]\nLaunch from within genome directory\n" unless @ARGV == 1;
+die "Usage: $0 mode[tiger/islander/mixed] logic[strict/lenient]\nLaunch from within genome directory\n" unless @ARGV == 2;
 my %mode; if ($ARGV[0] eq 'tiger') {%mode = (tiger => 1)} elsif ($ARGV[0] eq 'islander') {%mode = (islander => 1)} else {%mode = (tiger => 1, islander => 1)}
+my $logic = ($ARGV[1] eq "strict") ? 1 : 0;
+my $minIsle = ($logic) ? 5000 : 2000;
 
 my $dir = File::Spec->rel2abs($0); $dir =~ s/([^\/]+)$//;
 #$mode{superpositive} = '';  # File with new names scores
 my ($nick, %isl, %ends, $endorder, %tandems, %seen, %tandemtypes, %ct, %rejects, %splits, %dnas, %draws, %segCts, %trnas, %uniqIsles, %contexts, $org, %gnm, %tandCur, %serials, %rrna);
 my (@dnaRA, %hskpEnrich, %fornEnrich, %stats, $in, %prevScores, %oldprevs, @order, @annots);
 my (%is607, %supconfl, %skipInt, %litProv);
-my %aalookup = qw/Ala A Arg R Asn N Asp D Cys C Glu E Gln Q Gly G His H Ile I Ile2 J Leu L Lys K Met M Phe F Pro P Ser S Thr T Trp W Tyr Y Val V Pyl O SeC U tmRNA Z iMet B fMet B Sup X Undet ?/;
+my %aalookup = qw/Ala A Arg R Asn N Asp D Cys C Glu E Gln Q Gly G His H Ile I Ile2 J Leu L Lys K Met M Phe F Pro P Ser S Thr T Trp W Tyr Y Val V Pyl O SeC U SeC(p) U tmRNA Z iMet B fMet B Sup X Undet ?/;
 
 LoadContexts();
 my $intList = IntList();
@@ -40,13 +42,15 @@ if ($mode{tiger} and $mode{islander}) {
 }
 ReInt();
 if ($mode{tiger} and $mode{islander}) {
- if (defined $mode{superpositive}) {my $superpos = Superpositives($mode{superpositive}); exit}
+ #if (defined $mode{superpositive}) {my $superpos = Superpositives($mode{superpositive}); exit}
  EndTrna();
  my $ttot = 0; for (keys %tandems) {$ttot += keys %{$tandems{$_}}} warn "$ttot tandems\n" if $verbose;
- TandemSplit();
- TandemDeoverlap('multi');
+ #TandemSplit();
+ #TandemDeoverlap('multi');
 }
-if ($mode{tiger}) {TandemBuildCompOnly()}  # Treat comps that didn't fit into islr tandems
+if ($mode{tiger}) {
+ TandemBuildCompOnly();
+}  # Treat comps that didn't fit into islr tandems
 TandemSplit();  # All tandems
 TandemDeoverlap('multi');
 Write();
@@ -63,6 +67,7 @@ sub Load_housekeep_enrich {
 
 sub Load_tax {
  my @taxa = qw/? ? ? ? ? ? ? ?/;
+ $nick = "No_Nick";
  for (@{ReadFile("genome.tax")}) {
   my @f = split "\t";
   @taxa = (split(';', $f[2]), $f[1]);
@@ -172,12 +177,14 @@ sub Superpositives {
 sub Write {
  warn "Write\n" if $verbose;
  my %outIsles;
+ my %splitIsles;
  for my $dna (sort keys %tandems) {
   $dna =~ /^([^\.]+)/;
   #warn "$nick bestSupp $gnm{bestSupp}\n" if $gnm{bestSupp}; warn "$nick bestRejected $gnm{bestRejected}\n" if $gnm{bestRejected};
   #Load_tax() unless $org;
   for my $tand (sort {$tandems{$dna}{$a}{spans}[0]{L} <=> $tandems{$dna}{$b}{spans}[0]{L}} keys %{$tandems{$dna}}) {
    my $t = $tandems{$dna}{$tand};
+   #warn "Writing $$t{id}\n";
    my $finalCt = scalar(@{$$t{spans}});
    my ($rejectStatement, $segct) = ('', scalar(@{$$t{segments}})); #die "$segct segments in $$t{id}\n";
    #die "$$t{id}\n" unless $dnas{$dna}{org} and $$t{id} and $segct and $$t{members} and $$t{spans};
@@ -185,47 +192,82 @@ sub Write {
    my $header = "$nick $1   $dna:$$t{id}   $segct segments, " . scalar(keys %{$$t{members}}) . " input calls, $finalCt final calls";
    die "$header\nrejected_by=$$t{rejected_by}\n" if $$t{rejectees}{$$t{rejected_by}};
    #$$t{rejected_by} = "bestRejected:$gnm{bestRejected}" if $gnm{bestRejected} and $$t{bestSupp} < $gnm{bestRejected} and $$t{bestSupp} != 0 and not $$t{rejected_by};
+   if ($$t{other}{rejected_by}) { $$t{rejected_by} .= "OtherContig_$$t{other}{rejected_by},"; $$t{rejectees}{OtherConitg} ++; } 
    if ($$t{rejected_by}) {$rejectStatement .= "Rejected by $$t{rejected_by}\n"}
    if (keys %{$$t{rejectees}}) {$rejectStatement .= "Caused rejection of " . join(', ', keys %{$$t{rejectees}}) . "\n"}
-   push @{$draws{$segct}}, DrawTandem ($dna, $header, $$t{segments}, $$t{calls}, $$t{cuts}, $rejectStatement, $$t{spans});
+   warn "$$t{id}: $rejectStatement\n" if $$t{rejected_by};
    next if $$t{rejected_by};
    @{$$t{spans}} = sort {$$a{L} <=> $$b{L}} @{$$t{spans}};
-   my ($ct, @targets)= (0);
+   my $ct= 0;
    for my $span (@{$$t{spans}}) {
     $ct ++;
     $$span{supp} = 0;
     if ($$span{TIGER}) {for (@{$$span{TIGER}}) {$$span{supp} += $isl{$dna}{$_}{supp}}}
-    if ($$t{sources}{TIGER} and not $$t{sources}{Islander} and not $$span{source} eq 'Inferred') {$isl{$dna}{$$span{TIGER}[0]}{brief} =~ /^\d+\.(.*)/; push @targets, $1}
    }
-   my $target = '?';
-   if ($$t{target}) {$target = $$t{target}}
-   elsif ($$t{sources}{TIGER} and not $$t{sources}{Islander} and scalar(@targets) > 1) {$target = join(',', sort ($targets[0], $targets[-1]))}
-   elsif ($targets[0]) {$target = $targets[0]}
-   else {
-    for my $isle (keys %{$$t{members}}) {push @targets, $isl{$dna}{$isle}{target}}
-    $target = join(',', sort @targets) if @targets;
+   @{$$t{spans}} = sort {$$b{supp} <=> $$a{supp}} @{$$t{spans}};
+   for my $s1 (@{$$t{spans}}) {
+    next if $$s1{reject};
+    $$s1{used} = 1;
+    for my $s2 (@{$$t{spans}}) {
+     next if $$s2{reject} or $$s2{used};
+     next unless $$s1{L} < $$s2{R} or $$s1{R} > $$s2{L};
+     $$s2{reject} = 1;
+    }
    }
+   @{$$t{spans}} = sort {$$a{L} <=> $$b{L}} @{$$t{spans}};
+   #for my $span (@{$$t{spans}}) {
+    #next if $$span{reject};
+    #if ($$t{sources}{TIGER} and not $$t{sources}{Islander} and not $$span{source} eq 'Inferred') {$isl{$dna}{$$span{TIGER}[0]}{brief} =~ /^\d+\.(.*)/; push @targets, $1}
+   #}
+   #my $target = '?';
+   #if ($$t{target}) {$target = $$t{target}}
+   #elsif ($$t{sources}{TIGER} and not $$t{sources}{Islander} and scalar(@targets) > 1) {$target = join(',', sort ($targets[0], $targets[-1]))}
+   #elsif ($targets[0]) {$target = $targets[0]}
+   #else {
+    #my %targetIsl;
+    #for my $isle (keys %{$$t{members}}) {$targetIsl{$isl{$dna}{$isle}{target}}++;}
+    #@targets = keys %targetIsl;
+    #$target = join(',', sort @targets) if @targets;
+   #}
+   #warn "Targets - $$t{id}: @targets\n";
    #if ($target =~ /,/) {warn "comma left in target $target\n"}
-   if ($target =~ /,/) {if ($tandCur{$target}) {$target = $tandCur{$target}} else {warn "comma left in target $target\n"}}
-   $target =~ s/\([^\(]+\)//g;
-   my $context = $target; $context = $contexts{$target} if $contexts{$target};
+   #if ($target =~ /,/) {if ($tandCur{$target}) {$target = $tandCur{$target}} else {warn "comma left in target $target\n"}}
+   #$target =~ s/\([^\(]+\)//g;
+   #warn "$$t{id} - $target: $rejectStatement\n" if $$t{rejected_by};
+   #next if $$t{rejected_by};
+   #my $context = $target; $context = $contexts{$target} if $contexts{$target};
    #$context =~ s/^X$/Z/;
    $ct = 0;
    for my $span (@{$$t{spans}}) {
+    next if $$span{reject};
+    my $target = '?';
+    if ($$t{target}) {$target = $$t{target}}
+    elsif ($$t{sources}{TIGER} and not $$t{sources}{Islander} and not $$span{source} eq 'Inferred') {$isl{$dna}{$$span{TIGER}[0]}{brief} =~ /^\d+\.(.*)/; $target = $1}
+    else {
+     my %targetIsl;
+     for my $isle (keys %{$$t{members}}) {next if $isl{$dna}{$isle}{R} < $$span{L}; last if $isl{$dna}{$isle}{L} > $$span{R}; $targetIsl{$isl{$dna}{$isle}{target}}++;}
+     my @targets = keys %targetIsl;
+     $target = join(',', sort @targets) if @targets;
+    }
+    my $context = $target; $context = $contexts{$target} if $contexts{$target}; $context =~ s/^X$/Z/;
+    warn "Span $$span{id}\n";
     $ct ++;
-    my $trunc_len = sprintf('%0.f', ($$span{R}-$$span{L}+1)/1000);
-    next if $$span{R}-$$span{L}+1 < $minIsle;
-    my $overlap = "OLL=$ends{$dna}{$$span{L}}{L};OLR=$ends{$dna}{$$span{L}}{R};ORL=$ends{$dna}{$$span{R}}{L};ORR=$ends{$dna}{$$span{R}}{R};";
+    my $trunc_len = sprintf('%0.f', ($$span{len})/1000);
+    warn "$$t{id}:$$span{id} too short" if $$span{len} < $minIsle and not $splitIsles{$$span{id}};
+    next if $$span{len} < $minIsle and not $splitIsles{$$span{id}};
+    my $overlap = ''; # = "OLL=$ends{$dna}{$$span{L}}{L};OLR=$ends{$dna}{$$span{L}}{R};ORL=$ends{$dna}{$$span{R}}{L};ORR=$ends{$dna}{$$span{R}}{R};";
+    $overlap .= "IslCenter=$ends{$dna}{$$span{L}}{center};" if $ends{$dna}{$$span{L}}{center};
+    $overlap .= "IslCenter=$ends{$dna}{$$span{R}}{center};" if $ends{$dna}{$$span{R}}{center};
     my $orig = '';
     if ($$span{Islander}) {
      my $source = $$span{Islander}[0];
-     for (qw/int_site int_site_type trna_dupe tRNA_len qStart qEnd bit_score/) {$orig .= "$_=$isl{$dna}{$source}{$_};"}
+     for (qw/int_site_type/) {$orig .= "$_=$isl{$dna}{$source}{$_};"}
     }
     if ($$span{TIGER}) {
      my ($source, $best);
      for (@{$$span{TIGER}}) {unless ($best and $best > $isl{$dna}{$_}{supp}) {$best = $isl{$dna}{$_}{supp}; $source = $_}}
      #for (qw/contextsum refannot isleLseq unintSeq isleRseq gnm OL OU OR crossover/) {$orig .= "$_=$isl{$dna}{$source}{$_};"}
-     for (qw/contextsum isleLseq unintSeq isleRseq gnm OL OU OR crossover/) {$orig .= "$_=$isl{$dna}{$source}{$_};"}
+     for (qw/isleLseq unintSeq isleRseq gnm OL OU OR crossover/) {$orig .= "$_=$isl{$dna}{$source}{$_};"}
     }
     my $id = "$nick.$trunc_len.$context";
     $uniqIsles{$id} ++;
@@ -244,22 +286,52 @@ sub Write {
     my $normsupp = 0; $normsupp = sprintf('%.2f', 100*$$span{supp}/$gnm{bestSupp}) if $$span{supp};
     #my @is607; for (split ',', $prevScores{$dna}{$$span{L}}{$$span{R}}{ints}) {/^([^:]+)/; push @is607, $1 if $is607{$nick}{$1}} my $is607 = join(',', @is607);
     my $line = join("\t", $dna, $$span{source}, 'island', $$span{L}, $$span{R}, sprintf('%.3f', -1*$$span{logscore}), $$t{orient}, $normsupp, '');
-    $line .= "ID=$id;target=$target;$overlap$orig$org";
-    for my $cat (qw/supp ints deltaside len deltaint foreign housekeep hypoth delta_GC dinuc overall logscore/) {$line .= "$cat=$$span{$cat};"}
-    $line .= "rejectees=" . join(',', keys %{$$t{rejectees}}) . ";rejected_by=$$t{rejected_by};tandem=$$t{id};tandem_power=$finalCt;tandem_pos=$ct;project=$$t{project};\n";
-    %{$outIsles{$dna}{$id}} = (L => $$span{L}, line => $line, org => $org);
+    my $species = $1 if $org =~ /(species=[^;]*;)/;
+    my $coord = ($$t{orient} eq '+') ? "$dna/$$span{L}-$$span{R}" : "$dna/$$span{R}-$$span{L}";
+    $line .= "ID=$id;target=$target;coord=;compose=simple;$orig$overlap$species";
+    my (@ints, @tnps);
+    for (split(',', $$span{ints})) {
+     if (/Tnp/) {push @tnps, $_} else {push @ints, $_}
+    }
+    $$span{ints} = join(',', @ints); $$span{tnps} = join(',', @tnps);
+    for my $cat (qw/ints tnps deltaside len deltaint/) {$line .= "$cat=$$span{$cat};"}
+    #$line .= "rejectees=" . join(',', keys %{$$t{rejectees}}) . ";rejected_by=$$t{rejected_by};tandem=$$t{id}:$$span{id};tandem_power=$finalCt;tandem_pos=$ct;project=$$t{project};";
+    $line .= "tandem=$finalCt,$ct";
+    die "No left span for $$span{id}" unless $$span{L};
+    %{$outIsles{$dna}{$id}} = (L => $$span{L}, line => $line, len => ($$span{R}-$$span{L}+1), coord => $coord, dna => $dna) unless $splitIsles{$$span{id}};
+    #warn "Wrote $$t{id} - $id\n";
+    if ($splitIsles{$$span{id}}) {
+     for my $otherspan (@{$splitIsles{$$span{id}}}) {
+      $outIsles{$$otherspan{dna}}{$$otherspan{id}}{line} .= "\t$line";
+      $outIsles{$$otherspan{dna}}{$$otherspan{id}}{len} += ($$span{R}-$$span{L}+1);
+      $outIsles{$$otherspan{dna}}{$$otherspan{id}}{coord} .= "+$coord";
+      if ($dna eq $outIsles{$$otherspan{dna}}{$$otherspan{id}}{dna}) { $outIsles{$$otherspan{dna}}{$$otherspan{id}}{line} =~ s/compose=simple;/compose=circeJxn;/g } else {$outIsles{$$otherspan{dna}}{$$otherspan{id}}{line} =~ s/compose=simple;/compose=cross;/g }
+     }
+    }
+    if ($overlap =~ /IslCenter=/) { 
+     warn "For $$t{id}:$$span{id}, checking:\n";
+     for my $otherspan (@{$$t{other}{spans}}) {
+      next if $$otherspan{reject};
+      warn "$$t{other}{id}:$$otherspan{id}\n";
+      if ($$otherspan{L} == $$t{other}{center} or $$otherspan{R} == $$t{other}{center}) {
+       warn "$$t{other}{id}:$$otherspan{id} used\n";
+       push @{$splitIsles{$$otherspan{id}}}, {dna => $dna, id => $id};
+       last;
+      }
+     }
+    }
    }
   }
  }
+ open RES, ">resolve2.gff";
  for my $dna (sort keys %outIsles) {
   for my $id (sort {$outIsles{$dna}{$a}{L} <=> $outIsles{$dna}{$b}{L}} keys %{$outIsles{$dna}}) {
-   print $outIsles{$dna}{$id}{line};
+   warn "Island too short!\n", next if $outIsles{$dna}{$id}{len} < $minIsle;
+   $outIsles{$dna}{$id}{line} =~ s/coord=;/coord=$outIsles{$dna}{$id}{coord};/g;
+   print RES "$outIsles{$dna}{$id}{line}\n";
   }
  }
- open OUT, ">tandems.draw";
- for (sort {$b <=> $a} keys %draws) {
-  print OUT join('', @{$draws{$_}})
- } close OUT;
+ close RES;
  open OUT, ">prevScores.gff";
  for my $dna (sort keys %prevScores) {
   for my $L (sort {$a <=> $b} keys %{$prevScores{$dna}}) {
@@ -271,6 +343,7 @@ sub Write {
 sub TandemBuildCompOnly {
  warn "TandemBuildCompOnly\n" if $verbose;
  my ($mode) = ($_[0]); 
+ my %other;
  for my $dna (keys %ends) {
   my %islands;
   for (keys %{$ends{$dna}}) {  # For each vertex ...
@@ -289,7 +362,7 @@ sub TandemBuildCompOnly {
     warn "Both ends of $dna/$isle $side $isl{$dna}{$isle}{L} $isl{$dna}{$isle}{R} in end $$j{coord}($$j{L}-$$j{R})\n" if $jmembers{$isle}; 
     $jmembers{$isle} ++;
     $jtands{$islands{$isle}} ++ if $islands{$isle};  # Tandem call for other island end?
-    $isl{$dna}{$isle}{'end'.$2} = $$j{coord};  # Record ends for isls
+    $isl{$dna}{$isle}{'end'.$side} = $$j{coord};  # Record ends for isls
     if ($bestSupp < $isl{$dna}{$isle}{supp}) {$bestSupp = $isl{$dna}{$isle}{supp}; $orient = $isl{$dna}{$isle}{orient}};
     $totSupp += $isl{$dna}{$isle}{supp};
     #die "$dna $_ $$j{L} $$j{R} $isl{$dna}{$isle}{supp} $bestSupp $totSupp\n";
@@ -299,6 +372,7 @@ sub TandemBuildCompOnly {
    else {$tand = (keys %jtands)[0]}  # Choose one at random
    #print "tand $tand best $bestSupp\n" if $end =~ /1996344|2027690|2039871|2044751/;
    if (keys %jtands > 1) {  # Merge from other(s) into chosen
+    warn "Merging " . keys %jtands;
     for my $old (keys %jtands) {
      #print "old $tandems{$dna}{$old}{bestSupp}, chosen $bestSupp" if $end =~ /1996344|2027690|2039871|2044751/;
      $totSupp += $tandems{$dna}{$old}{totSupp};
@@ -313,12 +387,18 @@ sub TandemBuildCompOnly {
    $tandems{$dna}{$tand}{ends}{$$j{coord}} ++;
    @{$tandems{$dna}{$tand}}{qw/bestSupp orient/} = ($bestSupp, $orient) if not defined $tandems{$dna}{$tand}{bestSupp} or $bestSupp > $tandems{$dna}{$tand}{bestSupp};
    $tandems{$dna}{$tand}{totSupp} += $totSupp;
+   $tandems{$dna}{$tand}{dna} = $dna;
    #print "Current tand $tand best $tandems{$dna}{$tand}{bestSupp}, tot $tandems{$dna}{$tand}{totSupp}\n" if $end =~ /1996344|2027690|2039871|2044751/;
    for my $isle (keys %jmembers) {
     $tandems{$dna}{$tand}{sources}{$isl{$dna}{$isle}{source}} = 1;
     $tandems{$dna}{$tand}{project} = $isl{$dna}{$isle}{project};
     $tandems{$dna}{$tand}{members}{$isle} = 1;
     $islands{$isle} = $tand;
+    if ($isl{$dna}{$isle}{other}) {
+      $other{$isl{$dna}{$isle}{other}{ID}} = \%{$tandems{$dna}{$tand}};
+      warn "$isl{$dna}{$isle}{other}{ID} other: $dna $tand\n";
+    }
+    $tandems{$dna}{$tand}{center} = $isl{$dna}{$isle}{center} if $isl{$dna}{$isle}{center};
    }
   }  # end
   for (keys %{$tandems{$dna}}) {
@@ -331,6 +411,24 @@ sub TandemBuildCompOnly {
    $$t{power} = scalar(@ends);
   }
  }  # dna
+ for my $dna (keys %ends) {
+  for my $tand (keys %{$tandems{$dna}}) {
+   my $t = \%{$tandems{$dna}{$tand}};
+   for (keys %{$$t{ends}}) {
+    my $j = $ends{$dna}{$_};
+    for (keys %{$$j{members}}) {
+     next unless /(.*)([LR])$/;
+     my $isle = $1;
+     next unless $other{$isl{$dna}{$isle}{ID}};
+     $$t{other} = $other{$isl{$dna}{$isle}{ID}};
+     my @ends = sort {$a <=> $b} keys %{$$t{other}{ends}};
+     $$t{other}{id} = "C$ends[0]-$ends[-1]($$t{other}{bestSupp})" unless $$t{other}{id};
+     if ($$t{other}{sources}{TIGER} and $$t{other}{id} =~ s/^I/CI/) {}
+     warn "$dna $tand: $isl{$dna}{$isle}{ID} - $$t{id}:$$t{other}{id}\n";
+    }
+   }
+  }
+ }
 }
 
 sub TrnaStepoverTest {
@@ -347,6 +445,7 @@ sub TrnaStepoverTest {
 
 sub TandemBuildTrna {  # Tandem count from Islander unchanged by Comp inclusion
  my ($mode, $change) = ($_[0], 0);
+ my %other;
  for my $dna (keys %ends) {
   for my $tand (keys %{$tandems{$dna}}) {
    my $t = \%{$tandems{$dna}{$tand}};
@@ -356,7 +455,7 @@ sub TandemBuildTrna {  # Tandem count from Islander unchanged by Comp inclusion
     #warn "$end $$j{supp}\n";
     for (keys %{$$j{members}}) {  # Islands using that vertex
      #warn "$dna $end $_ $$j{L} $$j{R}\n";
-     die "$dna $_ $$j{L} $$j{R}\n" unless/(.*)([LR])$/;  # $1=island $2=side
+     die "$dna $_ $$j{L} $$j{R}" unless/(.*)([LR])$/;  # $1=island $2=side
      my ($isle, $side, $otherside) = ($1, $2, $2); $otherside =~ tr/LR/RL/; $otherside = $isl{$dna}{$isle}{'end'.$otherside};
      next if &{$$t{trnaStepoverTest}}($otherside);  # Prevents tRNA stepover
      next if $$t{members}{$isle};
@@ -370,11 +469,36 @@ sub TandemBuildTrna {  # Tandem count from Islander unchanged by Comp inclusion
      $$t{ends}{$otherside} = 1;
      $$t{sources}{$isl{$dna}{$isle}{source}} = 1;
      $$t{members}{$isle} = 1;
+     $$t{dna} = $dna;
+     $$t{center} = $isl{$dna}{$isle}{center} if $isl{$dna}{$isle}{center};
+     $$t{orient} = $isl{$dna}{$isle}{orient};
+     if ($isl{$dna}{$isle}{other}) {
+      $other{$isl{$dna}{$isle}{other}{ID}} = $t;
+      warn "other: $dna $tand\n";
+     }
     }
    }  # end
   }
   for (keys %{$tandems{$dna}}) {$tandems{$dna}{$_}{power} = scalar(keys %{$tandems{$dna}{$_}{ends}})}
  }  # dna
+ for my $dna (keys %ends) {
+  for my $tand (keys %{$tandems{$dna}}) {
+   my $t = \%{$tandems{$dna}{$tand}};
+   for (keys %{$$t{ends}}) {
+    my $j = $ends{$dna}{$_};
+    for (keys %{$$j{members}}) {
+     next unless /(.*)([LR])$/;
+     my $isle = $1;
+     next unless $other{$isl{$dna}{$isle}{ID}};
+     $$t{other} = $other{$isl{$dna}{$isle}{ID}};
+     my @ends = sort {$a <=> $b} keys %{$$t{other}{ends}};
+     $$t{other}{id} = "C$ends[0]-$ends[-1]($$t{other}{bestSupp})" unless $$t{other}{id};
+     if ($$t{other}{sources}{TIGER} and $$t{other}{id} =~ s/^I/CI/) {}
+     warn "$dna $tand: $isl{$dna}{$isle}{ID}\n";
+    }
+   }
+  }
+ }
  warn "TandemBuildTrna, $change changes\n" if $verbose; 
  return $change;
 }
@@ -392,26 +516,16 @@ sub LoadPrevScores {  # Because score calculation is slow
   my @f = split "\t";
   my $p = \%{$prevScores{$f[0]}{$f[3]}{$f[4]}};
   for my $cat (qw/ints deltaside len deltaint foreign housekeep hypoth delta_GC dinuc overall logscore/)
-  {die "$f[8]\n" unless $f[8] =~ s/;$cat=([^;]*)//; $$p{$cat} = $1}
+  {die "$f[8]" unless $f[8] =~ s/;$cat=([^;]*)//; $$p{$cat} = $1}
   ($$p{overall}, $$p{logscore}) = Score($$p{len}, $$p{deltaint}, $$p{foreign}, $$p{housekeep}, $$p{hypoth}, $$p{delta_GC}, $$p{dinuc});
   for my $cat (qw/len ints deltaside deltaint foreign housekeep hypoth delta_GC dinuc overall logscore/) {$f[8] .= "$cat=$$p{$cat};"}
   $$p{line} = join("\t", @f);
  }
 }
 
-sub TandemTest {
- my ($mode) = ($_[0]); 
- for my $dna (sort keys %tandems) {
-  for my $t (keys %{$tandems{$dna}}) {
-   die "no supp def $tandems{$dna}{$t}{id}\n" unless defined $tandems{$dna}{$t}{bestSupp};
-   $ct{tandem} ++;
-  }
- }
-}
-
 sub TandemDeoverlap {
- my ($mode) = ($_[0]); 
- warn "TandemDeoverlap\n" if $verbose; 
+ my ($mode) = ($_[0]);
+ warn "TandemDeoverlap\n" if $verbose;
  for my $dna (sort keys %tandems) {
   $dna =~ /^([^\.]+)/;
   my $d = $tandems{$dna};
@@ -429,11 +543,11 @@ sub TandemDeoverlap {
    my $ci = ''; for (@{$$t{spans}}) {$ci .= "$$_{L}-$$_{R}," if $$_{source} eq 'TIGER,Islander'}
    #print scalar(@{$$t{spans}}), " $$t{id}, $$t{bestSupp}, $$t{bestScore}, $$t{spans}[0]{L}-$$t{spans}[-1]{R}, $$t{questionable}, $$t{power}\n";
    next if $$t{rejected_by};
-   die "$$t{id} no bestSupport\n" unless defined $$t{bestSupp};
-   #die "$$t{spans}\n";   
+   die "$$t{id} no bestSupport" unless defined $$t{bestSupp};
+   #die "$$t{spans}\n";
    #next if $mode eq 'compSupport' and not $$t{sources}{TIGER};
    my @coords = ($$t{spans}[0]{L}, $$t{spans}[-1]{R});  # Termini of the trimmed tandem
-   die "$$t{id} $coords[0] and $coords[1]\n" unless $coords[0] and $coords[1];
+   die "$$t{id} $coords[0] and $coords[1]" unless $coords[0] and $coords[1];
    my (%endcats, %endnos, $islandL, @out);
    for my $j ($i+1 .. $#order) {  # Overlaps others?
     my $t2 = $tandems{$dna}{$order[$j]};
@@ -442,10 +556,11 @@ sub TandemDeoverlap {
     my @coords2 = ($$t2{spans}[0]{L}, $$t2{spans}[-1]{R});
     warn "$dna $$t{id} coords=@coords vs $$t2{id} coords2=@coords2\n" unless $coords2[1];
     next if $coords[0] > $coords2[1] or $coords[1] < $coords2[0] or $$t2{rejected_by};
-    #print "t1($$t{id}): $$t{bestSupp}, $$t{bestScore}, $$t{questionable}, $$t{power}\nt2($$t2{id}): $$t2{bestSupp}, $$t2{bestScore}, $$t2{questionable}, $$t2{power}\n\n";
+    #warn "t1($$t{id})}: $$t{bestSupp}, $$t{bestScore}, $$t{questionable}, $$t{power}\nt2($$t2{id}): $$t2{bestSupp}, $$t2{bestScore}, $$t2{questionable}, $$t2{power}\n\n";
     $gnm{bestRejected} = $$t2{bestSupp} unless $gnm{bestRejected} and $gnm{bestRejected} > $$t2{bestSupp} and $$t2{bestSupp} > 0;
-    $$t2{rejected_by} = $$t{id};
-    for (keys %{$$t2{members}}) {$isl{$dna}{$_}{rejected_by} .= ",$$t{id}"}
+    $$t2{rejected_by} = $$t{id}; $$t2{other}{rejected_by} = $$t2{id} if $$t2{other};
+    for (keys %{$$t2{members}}, keys %{$$t2{other}{members}}) {$isl{$dna}{$_}{rejected_by} .= ",$$t{id}"}
+    warn $$t2{other}{id} if $$t2{other};
     $$t{rejectees}{$$t2{id}} ++;
     #print "$dna:$$t2{id} $$_{L}-$$_{R} rejected by $$t{id} with CIs $ci\n";
     #for (@{$$t2{spans}}) {die "$dna @coords, @coords2\n" unless $$_{source}; push @{$ct{CIrejects}}, "$dna:$$t2{id} $$_{L}-$$_{R} rejected by $$t{id} with CIs $ci" if $$_{source} eq 'TIGER,Islander'}
@@ -461,43 +576,59 @@ sub TandemSplit {
   my $isleCt = 0;
   for (keys %{$tandems{$dna}}) {
    my ($tand, $t) = ($_, $tandems{$dna}{$_});
-   next if $$t{spans};  # Skip previously processed
+   warn "$dna $_\n";
    #print scalar(keys %{$$t{members}}), " members in $$t{id}\n"; for (keys %{$$t{members}}) {print "$_\n";} print scalar(keys %{$$t{ends}}), " ends in $$t{id}\n";
-   my ($L, @segments, %members, %coordpos, @coords, %supps, %segCt, @noInts, $noIntFlag, %cuts, @span, %usedTrna, @priorities);
+   my ($L, @segments, %members, %coordpos, %othercoordpos, @coords, @othercoords, %supps, %segCt, @noInts, $noIntFlag, %cuts, @span, %usedTrna, @priorities);
    for (sort {$a <=> $b} keys %{$$t{ends}}) {warn "No end $_ for $tand $dna\n" unless $ends{$dna}{$_}; push @coords, $_; $coordpos{$_} = $#coords; $supps{$#coords} = $ends{$dna}{$_}{supp};} # print "$tand $_\n"
+   for (sort {$a <=> $b} keys %{$$t{other}{ends}}) {push @othercoords, $_; $othercoordpos{$_} = $#othercoords;}
    for my $i (0..$#coords) {warn "test1: $dna $_ $i $#coords: @coords\n" unless defined $supps{$i}}
    #for (@coords) {print "$_\n"}
+   unless ($$t{id}) {  # TIGER-only islands get named now
+    $$t{id} = "C$coords[0]-$coords[-1]($$t{$criterion})";
+    die "compOnly contains islander $dna $$t{id}" if $$t{sources}{Islander};
+   }
+   warn "$$t{id}\n";
+   next if $$t{spans};
    $$t{rejected_by} = ''; %{$$t{rejectees}} = ();
    for my $isle (sort {$a <=> $b} keys %{$$t{members}}) {
     my $m = $isl{$dna}{$isle};
+    #warn "$$m{ID}:$coordpos{$$m{endL}}-$coordpos{$$m{endR}}\n";
     @{$m}{qw/len deltaint deltaside ints foreign housekeep hypoth delta_GC dinuc overall logscore/} = Span($dna, $$m{endL}, $$m{endR});
-    die "$tand $$t{id} $dna $$m{endL} $coordpos{$$m{endL}} $$m{endR} $coordpos{$$m{endR}} $$m{L} $$m{R}; @coords\n" unless defined($coordpos{$$m{endL}}) and defined($coordpos{$$m{endR}});
+    die "$tand $$t{id} $dna $$m{endL} $coordpos{$$m{endL}} $$m{endR} $coordpos{$$m{endR}} $$m{L} $$m{R}; @coords" unless defined($coordpos{$$m{endL}}) and defined($coordpos{$$m{endR}});
     push @{$members{$coordpos{$$m{endL}}}{$coordpos{$$m{endR}}}}, $isle;
     #print "$$t{id} $isle $members{$coordpos{$$m{endL}}}{$coordpos{$$m{endR}}}[0] $$m{endL} $coordpos{$$m{endL}}, $$m{endR} $coordpos{$$m{endR}} $dna\n";
    }
-   unless ($$t{id}) {  # TIGER-only islands get named now
-    $$t{id} = "C$coords[0]-$coords[-1]($$t{$criterion})";
-    die "compOnly contains islander $dna $$t{id}\n" if $$t{sources}{Islander};
-   }
-   for my $R (@coords) {  # Survey each segment for size, ints, find noInt segment blocks
-    if ($ends{$dna}{$R}{trna}) {for (keys %{$ends{$dna}{$R}{trna}}) {$usedTrna{$_} ++}}
-    $L = $coords[0], next unless $L;  # Initialize L end island
-    my ($len, $reject) = ($R-$L+1, '');
-    my ($ints, $deltaside, $delta) = IntOverlap($dna, $L, $R);
-    $reject = 'short' if $len < $minIsle;  # Shorts with ints are few, ignore in tandem-cutting, then warn if any products too short
-    if ($ints) {
-     unless ($noIntFlag) {$cuts{$coordpos{$L}} ++}
-     $noIntFlag = 0;
-    } else {
-     $reject = 'noInt';
-     unless ($noIntFlag) {push @noInts, [$coordpos{$L}]}
-     push @{$noInts[-1]}, $coordpos{$R};
-     $noIntFlag ++;
+   #warn "Coords - $$t{id}: @coords\n";
+   for my $i (0..$#coords) {  # Survey each segment for size, ints, find noInt segment blocks
+    $L = $coords[$i];
+    for my $j ($i+1..$#coords) {
+     my $R = $coords[$j];
+     if ($ends{$dna}{$R}{trna}) {for (keys %{$ends{$dna}{$R}{trna}}) {$usedTrna{$_} ++}}
+     $L = $coords[0], next unless $L;  # Initialize L end island
+     my $reject = '';
+     my $len = $R - $L + 1;
+     my ($ints, $deltaside, $delta) = IntOverlap($dna, $L, $R);
+     $reject = 'short' if $len < $minIsle and not $$t{other}; # Shorts with ints are few, ignore in tandem-cutting, then warn if any products too short
+     if ($ints) {
+      unless ($noIntFlag) {$cuts{$coordpos{$L}} ++}
+      $noIntFlag = 0;
+     } else {
+      my $otherints = IntOverlap($$t{other}{dna}, $othercoords[0], $othercoords[-1]) if $$t{other} and @othercoords;
+     if ($otherints) {
+       unless ($noIntFlag) {$cuts{$coordpos{$L}} ++}
+       $noIntFlag = 0;
+      }
+      else {
+       $reject = 'noInt';
+       unless ($noIntFlag) {push @noInts, [$coordpos{$L}]}
+       push @{$noInts[-1]}, $coordpos{$R};
+       $noIntFlag ++;
+      }
+     }
+     push @segments, {L => $L, R => $R, len => $len, ints => $ints, deltaside => $deltaside, delta => $delta, reject => $reject};
+     #print "$#coords $reject $L $R\n";
+     $segCts{$#coords}{$reject} ++;
     }
-    push @segments, {L => $L, R => $R, len => $len, ints => $ints, deltaside => $deltaside, delta => $delta, reject => $reject};
-    #print "$#coords $reject $L $R\n";
-    $segCts{$#coords}{$reject} ++;
-    $L = $R;
    }
    for my $i (0..$#coords) {warn "test2: $dna $_ $i $#coords: @coords\n" unless defined $supps{$i}}
    for my $s (@segments) {for (@{$trnas{$dna}}) {next if $$s{L} > $$_{R}; last if $$s{R} < $$_{L}; next if $usedTrna{$$_{id}}; $$s{trna}{$$_{id}} ++}}
@@ -509,7 +640,7 @@ sub TandemSplit {
    for my $i (@noInts) {for (sort {$supps{$b} <=> $supps{$a}} @{$i}) {if ($supps{$_} > 0) {
     push @priorities, $_; #print "priority supp:$supps{$_} node:$_\n";
    }}}  # Prioritize only non-zero supp ends
-   #print "$$t{id} @priorities\n";
+   #warn "Priorities - $$t{id}: @priorities\n";
    my @rounds = [['Lend']];  # array of rounds of splittings expansions, each round is array of arrays of cuts to test
    my $lastBreak = -1;
    if (@noInts and $noInts[0][0] != 0) {$lastBreak = $noInts[0][0]-1; $rounds[-1][-1][-1] = $coords[$lastBreak]}
@@ -519,6 +650,7 @@ sub TandemSplit {
      #print $lastBreak+1, " < $$i[0] so Process1\n";
      for (ProcessRound($dna, $coords[$lastBreak+1], 1, \@{$rounds[-1]}, \@priorities)) {
       #print "Process2: $_ '$coordpos{$_}'\n";
+      #warn "Debug - $$t{id}: $_; $coordpos{$_}\n";
       $cuts{$coordpos{$_}} ++;
      }
      $lastBreak = $$i[0]-1;
@@ -542,33 +674,43 @@ sub TandemSplit {
    }
    my $coord = 'Rend'; $coord = $coords[$lastBreak+1] if $lastBreak+1 <= $#coords;
    #print "done noInts; $dna $lastBreak $#coords $coord $rounds[-1][-1][-1]\n";
-   unless ($lastBreak == -1) {for (ProcessRound($dna, $coord, 2, \@{$rounds[-1]})) {$cuts{$coordpos{$_}} ++}}
+   unless ($lastBreak == -1) {for (ProcessRound($dna, $coord, 2, \@{$rounds[-1]})) {$cuts{$coordpos{$_}} ++;}}
    my @cuts = sort {$a <=> $b} keys %cuts;
    #for (@cuts) {print "$_\n"} exit;
    $L = ''; my $lastCut = $cuts[0];
-   for (@cuts) {
-    $L = $coords[$_], next unless $L;
-    my $R = $coords[$_];
-    #print "$_ $coords[$_] $L $R\n";
-    my %source;
-    push @{$$t{spans}}, {L => $L, R => $R, posL => $lastCut, posR => $_, len => $R-$L+1};
-    if ($members{$coordpos{$L}}{$coordpos{$R}}) {
-     for (@{$members{$coordpos{$L}}{$coordpos{$R}}}) {
-      die "$dna, $L, $R, $coordpos{$L}, $coordpos{$R}\n" unless $_;
-      $source{$isl{$dna}{$_}{source}} ++;
-      push @{$$t{spans}[-1]{$isl{$dna}{$_}{source}}}, $_;
-      push @{$$t{spans}[-1]{members}}, $_;
-      $isl{$dna}{$_}{tandem} = $tand;
-     }
-    } else {$source{Inferred} ++;}
-    $$t{spans}[-1]{source} = join(',', sort keys %source);
-    #print "$$t{spans}[-1]{source} $$t{id} $dna $L $R\n";
-    $isleCt ++;
-    Span($dna, $L, $R) unless $prevScores{$dna}{$L}{$R};
-    for (keys %{$prevScores{$dna}{$L}{$R}}) {$$t{spans}[-1]{$_} = $prevScores{$dna}{$L}{$R}{$_}}
-    $$t{bestScore} = $$t{spans}[-1]{logscore} unless $$t{bestScore} and $$t{bestScore} < $$t{spans}[-1]{logscore};
-    $L = $R;
-    $lastCut = $_;
+   my $counts = 0;
+   my $numCoordPos = scalar keys %coordpos;
+   push @cuts, (0..$numCoordPos) if scalar @cuts == 0;
+   #warn "Cuts - $$t{id}: @cuts";
+   my @spans;
+   for my $i (0..$#cuts) {
+    $L = $coords[$cuts[$i]];
+    for my $j ($i+1..$#cuts) {
+     $counts++;
+     my $R = $coords[$cuts[$j]];
+     my $length = $R - $L + 1;
+     #print "$_ $coords[$_] $L $R\n";
+     my %source;
+     push @{$$t{spans}}, {id => "$tand.$counts", L => $L, R => $R, posL => $lastCut, posR => $cuts[$j], len => $length};
+     #warn "New Tandem Span - $$t{id}/$$t{spans}[-1]{id}:$L-$R;$coordpos{$L}-$coordpos{$R}\n";
+     if ($members{$coordpos{$L}}{$coordpos{$R}}) {
+      for (@{$members{$coordpos{$L}}{$coordpos{$R}}}) {
+       die "$dna, $L, $R, $coordpos{$L}, $coordpos{$R}" unless $_;
+       $source{$isl{$dna}{$_}{source}} ++;
+       push @{$$t{spans}[-1]{$isl{$dna}{$_}{source}}}, $_;
+       push @{$$t{spans}[-1]{members}}, $_;
+       $isl{$dna}{$_}{tandem} = $tand;
+       #warn "$isl{$dna}{$_}{ID}:$coordpos{$L}-$coordpos{$R}\n";
+      }
+     } else {$source{Inferred} ++;}
+     $$t{spans}[-1]{source} = join(',', sort keys %source);
+     #print "$$t{spans}[-1]{source} $$t{id} $dna $L $R\n";
+     $isleCt ++;
+     Span($dna, $L, $R) unless $prevScores{$dna}{$L}{$R};
+     for (keys %{$prevScores{$dna}{$L}{$R}}) {$$t{spans}[-1]{$_} = $prevScores{$dna}{$L}{$R}{$_}}
+     $$t{bestScore} = $$t{spans}[-1]{logscore} unless $$t{bestScore} and $$t{bestScore} < $$t{spans}[-1]{logscore};
+     $lastCut = $cuts[$j];
+    }
    }
    for my $L (keys %members) {for my $R (keys %{$members{$L}}) {for my $isle (@{$members{$L}{$R}}) {  # Reject original island to prevent reuse
     $isl{$dna}{$isle}{rejected_by} .= "split($tand)," unless $isl{$dna}{$isle}{tandem};
@@ -677,7 +819,7 @@ sub MultiT {
 
 sub Ends {
  my %i;
- @i{qw/dna id supp L R LL LR RL RR/} = @_;
+ @i{qw/dna id supp L R LL LR RL RR center/} = @_;
  #print "dna=$i{dna} id=$i{id} L=$i{L} R=$i{R} LL=$i{LL} LR=$i{LR} RL=$i{RL} RR=$i{RR} supp=$i{supp}\n";
  my $dna = $i{dna};
  for my $side (qw/L R/) {
@@ -686,6 +828,8 @@ sub Ends {
   $i{$side} = $i{$side.'R'} if $i{$side} > $i{$side.'R'};
   for (sort {$a <=> $b} keys %{$ends{$dna}}) {
    my $j = $ends{$dna}{$_};
+   #die "No $side.L found\n" unless $i{$side.'L'};
+   #die "No previous R found\n" unless $$j{R};
    next if $i{$side.'L'} > $$j{R};
    last if $i{$side.'R'} < $$j{L};
    if ($i{$side.'L'} < $$j{L}) {$$j{L} = $i{$side.'L'}; $expand = $_}
@@ -698,9 +842,10 @@ sub Ends {
   }
   unless ($done) {  # End is new, start new entry
    $endorder ++;
-   #print "new start $i{id}.$side $i{$side} L=$i{$side.'L'} R=$i{$side.'R'}\n";
-   %{$ends{$dna}{$i{$side}}} = (L => $i{$side.'L'}, R => $i{$side.'R'}, order => $endorder, nominal => $i{$side}, coord => $i{$side}, founder => $i{id}.$side,
-    members => {$i{id}.$side => 1}, supp => $i{supp});
+   #warn "new start $i{id}.$side $i{$side} L=$i{$side.'L'} R=$i{$side.'R'}\n";
+   %{$ends{$dna}{$i{$side}}} = (L => $i{$side.'L'}, R => $i{$side.'R'}, order => $endorder, nominal => $i{$side}, coord => $i{$side}, founder => $i{id}.$side, members => {$i{id}.$side => 1}, supp => $i{supp});
+   $ends{$dna}{$i{$side}}{center} = $i{center} if $i{center} and $i{$side} == $i{center};
+   die "$dna: $i{$side} $i{$side.'L'}" unless $ends{$dna}{$i{$side}}{L};
   }
   next unless $expand;  # Otherwise, possible merging
   my $to = $ends{$dna}{$expand};
@@ -720,7 +865,7 @@ sub Ends {
    }
    for (keys %{$$from{members}}) {
     $$to{members}{$_} ++;
-    die "$dna $_ parse\n" unless /(.*)([LR])$/;
+    die "$dna $_ parse" unless /(.*)([LR])$/;
     $isl{$dna}{$1}{'end'.$2} = $$to{coord};
     #print "isle $1 $2 changed from $$from{coord} to $$to{coord}\n";
    }
@@ -751,20 +896,6 @@ sub EndTrna {
  }
 }
 
-sub TandemBuildLite {
- for my $dna (keys %ends) {
-  for (keys %{$ends{$dna}}) {  # For each vertex ...
-   my ($end, $j) = ($_, $ends{$dna}{$_});
-   for (keys %{$$j{members}}) {  # Islands using that vertex
-    #print "$$j{L}-$$j{R} $_ $$j{supp}\n";
-    die "$dna $_ $$j{L} $$j{R}\n" unless /(.*)([LR])$/;  # $1=island $2=side
-    $isl{$dna}{$1}{'end'.$2} = $$j{coord};  # Record ends for isls
-    $tandems{$dna}{$isl{$dna}{$1}{group}}{ends}{$$j{coord}} ++ if $isl{$dna}{$1}{group};
-   }
-  }
- }
-}
-
 sub Islander {
  warn "Islander input $_[0]\n" if $verbose; 
  for (@{ReadFile($_[0])}) {
@@ -779,6 +910,7 @@ sub Islander {
   next if $rejects{$l{ID}};
   next if $l{origin} == 1;  # Deal with origin-crossers later, manually?
   $l{brief} = sprintf('%0.f', ($l{R}-$l{L}+1)/1000) . '.' . $l{tRNA_aa};
+  $l{target} = $l{tRNA_aa};
   my ($coord, $dir) = ($l{L}, 1);  # Start calculating tRNA query hit genomic coordinates
   if (abs($l{hitStart} - $l{L}) < abs($l{hitStart} - $l{R})) {$coord = $l{R}; $l{trnaSide} = 'R'}  # Hit closer to L (so tRNA closer to R)
   $dir = -1 if $f[6] eq '-';
@@ -789,7 +921,7 @@ sub Islander {
   #die "$f[0] $l{ID} $l{hitStart} $l{hitEnd}\n$_\n" unless $l{hitStart} and $l{hitEnd};
   $ct{islct} ++;
   $l{reject} = '';
-  @l{qw/endL endR/} = Ends($f[0], $ct{islct}, $l{supp}, (sort {$a <=> $b} $l{L}, $l{R}), $l{OLL}, $l{OLR}, $l{ORL}, $l{ORR});
+  @l{qw/endL endR/} = Ends($f[0], $ct{islct}, $l{supp}, (sort {$a <=> $b} $l{L}, $l{R}), $l{OLL}, $l{OLR}, $l{ORL}, $l{ORR}, $l{center});
   #print "$l{ID}: L=$l{L}, R=$l{R}, endL=$l{endL}, endR=$l{endR}, suppL=$ends{$f[0]}{$l{endL}}{supp}, suppR=$ends{$f[0]}{$l{endR}}{supp}, LL=$l{OLL}, LR=$l{OLR}, RL=$l{ORL}, RR=$l{ORR}\n";
   $isl{$f[0]}{$ct{islct}} = \%l;
  }
@@ -810,6 +942,7 @@ sub FreshTandem {  # Separated from Islander because endL,endR may change during
    $$t{trnaStepoverTest} = sub {return 1 if shift() > $$i{endR}} if $$t{trnaSide} eq 'R';
    $$t{bestScore} = $$i{logscore} unless $$t{bestScore} and $$t{bestScore} < $$i{logscore};
    $$t{project} = $$i{project};
+   $$t{dna} = $dna;
   }
   for (keys %{$tandems{$dna}}) {$tandems{$dna}{$_}{power} = scalar(keys %{$tandems{$dna}{$_}{ends}})}
  }
@@ -818,26 +951,54 @@ sub FreshTandem {  # Separated from Islander because endL,endR may change during
 sub Tiger {
  warn "TIGER input $_[0]\n" if $verbose;
  for (@{ReadFile($_[0])}) {
-  # NC_017765.1	TIGER	island	9930995	9936042	3	+	.	brief=5HYP|ykoV;len=5047;contextsum=HYP>/>ykoV;prefCoords=9930995,9936041;bitsum=5923;gnm=NZ_CP013219.1:8562516-8565515;q1=94.105:11502-14268(9928230-9930996)>8559973-8562766;q2=93.739:250-1398>9936041-9937167;crossover=2;int=PhageIntegrase.9:9931135-9932322;mid=9931728;side=L612;OL=9930995-9930996;OR=9936041-9936042;OU=8562763-8562766;mobQ1=;mobQ2=;IS=;ISoverlap=;transposon=;ISidentical=;context=//hypothetical_protein/Lintergene/3prime/752,/ykoV_2//Rintergene/5prime/697;origOrient=+;q1identity=94.105;q2identity=93.739;isleLseq=ATGCCCCGAACGATCTGGTCCGGCGCGATCTCCTTCGGCCTGGTCACGGTgcTTATCTAGATCTGCATCACGGGTGTGAGGCACGTGAGGTCAGGTTTCATT;unintSeq=ATGCCCCGAACGATCTGGTCCGGCGCGATCTCCTTCGACCTGGTCACGGTgcCGATCAATGTGGTCGGCGCGACTGAGGACCACAGCATCCACTTCCACCAG;isleRseq=AGGAGAGCGCTCCTGACCTGCACATTCGCGGACGACATCTAGATAAGCACgcCGATCAATGTGATCGGCACCACCGAGGACCACAGCATCCACTTCCACCAG;mean=3255.66666666667;SD=1886.08948768492;deltaint=140;foreign=3.45631636123481;housekeep=13.1361382343199;hypoth=0.240129377648896;delta_GC=-0.07055;dinuc=0.06655;FPscore=6.71216010418801e-08;project=89409;division=Bacteria;phylum=Actinobacteria;order=Actinobacteria;class=Streptomycetales;family=Streptomycetaceae;genus=Streptomyces;species=Streptomyces hygroscopicus;org=Streptomyces hygroscopicus subsp. jinggangensis 5008;taxid=1133850;gencode=11;replicon=Chr;qlen=15000;ints=PhageIntegrase.9,PhageIntegrase.10;
+  # SHRK01000017.1  TIGER   island  1       23989   148     -       .       ID=Blo220.60.L;brief=60.L;coord=SHRK01000017.1/23989-1+SHRK01000018.1/1-36385;compose=cross;len=60372;context=L;flanks=nudF<>pdtaR;flip=1;bitsum=30981;gnm=Blo292/CP026999.1;crossover=34;int=Y-Int.2:36068-34704;mid=35386;side=R3849;end0=SHRK01000017.1,-1,23972..24005;end1=SHRK01000018.1,-1,36368..36403;OL=23972-24005;OR=36368-36401;OU=841539-841572;mobQ1=;mobQ2=;IS=;ISoverlap=;transposon=;ISidentical=;q1=99.971:1-14018(SHRK01000018.1:50385-36368)>855554-841539;q2=99.856:218-3000>SHRK01000017.1:23972-26754;q1identity=99.971;q2identity=99.856;isleLseq=CTTTGGCACGCCCTCGTATCCCAATTGGTAGAGGAAGCAGCCTCAAAATCtgcgcagtgtgggttcgagtcccaccgagggcacCCAAAAGTCCGGGTCATACGGCATCACGATGGCGCGGGGCGAATTGTTCG;unintSeq=CTTTGGCACGCCCTCGTATCCCAATTGGTAGAGGAAGCAGCCTCAAAATCtgcgcagtgtgggttcgagtcccaccgagggcacTTTAGTTAGGAGTTCGCTGAAATTATTGTGAACCCCATTGTTGGGTAATT;isleRseq=TGAGTCAGAAGCGATTCCTGACAAGGAATTGCCCTCAGCTCGGCAGGGTAtgcgaaggtggtgggttcgagtcccaccgagggcACTTTAGTTAGGAGTTCGCTGAAATTATTGTGAACCCCATTGTTGGGTAA;mean=25095.1397849462;SD=5715.70233239129;deltaint=1;foreign=2.13980503894524;housekeep=2.4576843064147;hypoth=0.578389830508475;delta_GC=0.05835;dinuc=0.076675;islrScore=3.33601552941834e-06;compScore=1.86220330389706e-06;project=genome;division=;phylum=;order=;class=;family=;genus=;species=;org=;taxid=gencode=11;replicon=Scf;qlen=15000;refannot=;ints=Y-Int.2;reject=;positive=true;status=nonoverlap;
   next if /replicon=Plm/;
   chomp;
+  my $coord = $1 if /coord=([^;]+);/;
   my @f = split "\t";
-  my %flag; for (@{$rrna{$f[0]}}) {last if $$_[0] > $f[4]; next if $$_[1] < $f[3]; $flag{$$_[2]} ++}
-  print "Rejecting $f[0]:$f[3]-$f[4], rRNA operon\n", next if $flag{'23S'} and $flag{'16S'};
-  my %l = (dna => $f[0], source => 'TIGER', L => $f[3], R => $f[4], supp => $f[5], orient => $f[6], line => $_, f8 => $f[8], rRNA => '', trnaSide => '');
-  for (split ';', $f[8]) {$l{$1} = $2 if /^([^=]+)=([^;]+)/}
-  die "$_\n" unless $l{R} and $l{L} and $l{brief};
-  $serials{$l{brief}} ++;
-  $l{ID} = "$nick.$l{brief}.$serials{$l{brief}}"; 
-  $f[0] =~ /^([^\.]+)/;
-  $gnm{bestSupp} = $f[5] unless $gnm{bestSupp} and $gnm{bestSupp} > $f[5];
-  next if $rejects{$l{ID}};
-  unless ($f[8] =~ /OL=(\d+)-(\d+);OR=(\d+)-(\d+);/) {print "no OL or OR for $_\n"; next}
-  ($l{OLL}, $l{OLR}, $l{ORL}, $l{ORR}) = sort {$a <=> $b} ($1, $2, $3, $4);
-  $ct{islct} ++;
-  @l{qw/endL endR/} = Ends($f[0], $ct{islct}, $l{supp}, (sort {$a <=> $b} $l{L}, $l{R}), $l{OLL}, $l{OLR}, $l{ORL}, $l{ORR});
-  #die "$l{ID}: L=$l{L}, R=$l{R}, endL=$l{endL}, endR=$l{endR} LL=$l{OLL}, LR=$l{OLR}, RL=$l{ORL}, RR=$l{ORR} supp=$l{supp}\n";
-  $isl{$f[0]}{$ct{islct}} = \%l;
+  $coord = "$f[0]/$f[3]-$f[4]" unless $coord;
+  $f[8] .= "compose=simple;" unless $f[8] =~/compose=[^;]+/;
+  my @contig = split(/\+/, $coord);
+  my @other;
+  my $line = $_;
+  for (0..$#contig) {
+   next unless $contig[$_] =~ /([^\/]+)\/(\d+)-(\d+)/;
+   $f[0] = $1; ($f[3], $f[4]) = sort {$a <=> $b} ($2, $3); $f[6] = ($3 > $2) ? "+" : "-";
+   my %flag; for (@{$rrna{$f[0]}}) {last if $$_[0] > $f[4]; next if $$_[1] < $f[3]; $flag{$$_[2]} ++}
+   print "Rejecting $f[0]:$f[3]-$f[4], rRNA operon\n", next if $flag{'23S'} and $flag{'16S'};
+   my %l = (dna => $f[0], source => 'TIGER', L => $f[3], R => $f[4], supp => $f[5], orient => $f[6], line => $line, f8 => $f[8], rRNA => '', trnaSide => '');
+   for (split ';', $f[8]) {$l{$1} = $2 if /^([^=]+)=([^;]+)/}
+   die "$_" unless $l{R} and $l{L} and $l{brief};
+   $serials{$l{brief}} ++;
+   $nick = $l{ID} if $nick eq "No_Nick"; $nick =~ /^([^\.]+)/; $nick = $1;
+   $l{ID} = "$nick.$l{brief}.$serials{$l{brief}}";
+   $l{target} = $l{brief}; $l{target} =~ s/[^\.]+\.//;
+   $f[0] =~ /^([^\.]+)/;
+   $gnm{bestSupp} = $f[5] unless $gnm{bestSupp} and $gnm{bestSupp} > $f[5];
+   next if $rejects{$l{ID}};
+   unless ($f[8] =~ /OL=(\d+)-(\d+);OR=(\d+)-(\d+);/) {print "no OL or OR for $_\n"; next}
+   my ($LL, $LR, $RL, $RR) = ($1, $2, $3, $4);
+   if ($l{compose} eq "simple") {
+    ($l{OLL}, $l{OLR}, $l{ORL}, $l{ORR}) = sort {$a <=> $b} ($LL, $LR, $RL, $RR);
+   } else {
+    my ($side1, $side2);
+    if ($l{orient} eq '+') { ($side1, $side2) = ('L', 'R') } else { ($side1, $side2) = ('R', 'L') }
+    if ($_) {
+     ($l{'O'.$side2.'L'}, $l{'O'.$side2.'R'}) = sort {$a <=> $b} ($RL, $RR);
+     ($l{'O'.$side1.'L'}, $l{'O'.$side1.'R'}, $l{center}) = ($l{$side1}, $l{$side1}, $l{$side1});
+    } else {
+     ($l{'O'.$side1.'L'}, $l{'O'.$side1.'R'}) = sort {$a <=> $b} ($RL, $RR);
+     ($l{'O'.$side2.'L'}, $l{'O'.$side2.'R'}, $l{center}) = ($l{$side2}, $l{$side2}, $l{$side2});
+    }
+   }
+   $ct{islct} ++;
+   @l{qw/endL endR/} = Ends($l{dna}, $ct{islct}, $l{supp}, $l{L}, $l{R}, $l{OLL}, $l{OLR}, $l{ORL}, $l{ORR}, $l{center});
+   warn "$l{ID}: dna=$f[0] L=$l{L}, R=$l{R}, endL=$l{endL}, endR=$l{endR} LL=$l{OLL}, LR=$l{OLR}, RL=$l{ORL}, RR=$l{ORR} supp=$l{supp}\n";
+   $isl{$f[0]}{$ct{islct}} = \%l;
+   push @other, ($f[0], $ct{islct});
+  }
+  next if $f[8] =~ /compose=simple/;
+  $isl{$other[0]}{$other[1]}{other} = \%{$isl{$other[2]}{$other[3]}}; $isl{$other[2]}{$other[3]}{other} = \%{$isl{$other[0]}{$other[1]}};
  }
 }
 
@@ -896,8 +1057,14 @@ sub IntList {
  for (`cat genome.gff`) {
   my @f = split "\t";
   push @{$rrna{$f[0]}}, [$f[3], $f[4], $1] if /\trRNA\t.*product=(23S|16S) ribosomal RNA/;
-  next unless $f[8] =~ /annot=([^;]+)/;
-  @{$intList{$f[0]}{$1}} = ($f[3], $f[4], int(($f[3]+$f[4])/2));  # Gene midpoint
+  my $annot;
+  if ($logic) {
+   next unless $f[8] =~ /annot=(Y-Int|S-Int)/; $annot = $1;
+  } else {
+   #next if /(?i)transposase/;
+   next unless $f[8] =~ /annot=([^;]+)/; $annot = $1;
+  }
+  @{$intList{$f[0]}{$annot}} = ($f[3], $f[4], int(($f[3]+$f[4])/2));  # Gene midpoint
  }
  return \%intList;
 }
@@ -923,11 +1090,10 @@ sub Scores {
  Load_dna() unless $stats{$dna} and $stats{$dna}{seq};
  #die "$dna $L $R ", length($stats{$dna}{seq}), " bp\n";#, $stats{$dna}{seq}\n";
  my $len = Len($dna, $L, $R);
- die keys(%stats), " $dna $len $L $R $origin\n" if $L < 1 or $R > $stats{$dna}{len} or $L == $R;
+ die keys(%stats), " $dna $len $L $R $origin" if $L < 1 or $R > $stats{$dna}{len} or $L == $R;
  #warn length($stats{$dna}{seq}), " 2 $dna $L $R $origin $stats{$dna}{len}:scores\n" if not $stats{$dna}{len} or $stats{$dna}{len} == length($stats{$dna}{seq}); 
- my ($deltaGC, $dinuc) = Bias($dna, $L, $R, $origin);  # Use whole genomes stats
- #warn length($stats{$dna}{seq}), " 3 $dna $stats{$dna}{len}:scores\n"; 
  my ($ints, $deltaside, $delta_int) = IntOverlap($dna, $L, $R);
+ my ($deltaGC, $dinuc) = Bias($dna, $L, $R, $origin);  # Use whole genomes stats
  my ($hypoth, $forn, $hskp) = Foreign($dna, $ints, $L, $R, $origin);
  my ($overall, $logscore) = Score($len, $delta_int, $forn, $hskp, $hypoth, $deltaGC, $dinuc);
  return ($len, $delta_int, $deltaside, $ints, $forn, $hskp, $hypoth, $deltaGC, $dinuc, $overall, $logscore);

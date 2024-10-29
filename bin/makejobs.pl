@@ -12,7 +12,8 @@ for (glob "Isles/*"){
  next unless /(\S+)/;
  $prefix = $1;
  $prefix =~ s/Isles\///; 
- $stripfix = $prefix; $stripfix =~ s/\.x$//; 
+ $stripfix = $prefix; $stripfix =~ s/\.x$//;
+ next if ($prefix eq "phage.txt" or $prefix eq "ICE.txt");
  my $head = substr($prefix, 0, 15); 
  print OUT "cd Isles/$prefix; perl $dir/ice.pl genome.fa; cd ../../;\n"; 
  print OUT "cd Isles/$prefix; perl $dir/phage.pl genome.fa; cd ../../;\n"; 

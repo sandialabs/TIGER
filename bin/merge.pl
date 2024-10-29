@@ -137,7 +137,7 @@ for my $i (@merge) {  # Better-supported first, no previous rejects remain
  my $len = $1;
  $$i{brief} =~ s/^_//; $$i{brief} =~ s/_$//;
  $$i{brief} =~ s/_HYP//; $$i{brief} =~ s/HYP_//;
- $$i{brief} =~ s/^(.)_..+/$1/; $$i{brief} =~ s/^..+_(.)$/$1/;
+ $$i{brief} =~ s/^(\D)_..+/$1/; $$i{brief} =~ s/^..+_(\D)$/$1/;
  $$i{name} = "$nick.$len.$$i{brief}";
  if ($serials{$$i{name}}) {$serials{$$i{name}} ++; $$i{name} .= ".$serials{$$i{name}}"} else {$serials{$$i{name}} ++}
  $$i{line} =~ s/brief=/ID=$$i{name};brief=/;

@@ -14,15 +14,15 @@ system "perl $dir/makejobs.pl";
 system "bash job"; 
 #system "perl $dir/transposaser.pl $study"; 
 #system "perl $dir/selfblast.pl isles.fa > isles.invrep";
-system "cat Isles/*/phage.txt > Isles/phage.txt"; 
-system "cat Isles/*/ICE.txt > Isles/ICE.txt"; 
+system "cat Isles/*/phage.txt > phage.txt"; 
+system "cat Isles/*/ICE.txt > ICE.txt"; 
 
 my (%isles, %cats, %phage, %ice, %transposases, %invRep, $topSupp);
 
 #for (`cat transposase.txt`) {chomp; my @f = split "\t"; $transposases{$f[0]} = $f[1]}
 #for (`cat isles.invrep`) {my @f = split "\t"; $invRep{$f[0]} = $f[3]-$f[2]+1} 
-for (`cat Isles/phage.txt`) {chomp; my @f = split "\t"; $phage{$f[0]} = $f[3]}
-for (`cat Isles/ICE.txt`) {chomp; my @f = split "\t"; $ice{$f[0]} = $f[9]}
+for (`cat phage.txt`) {chomp; my @f = split "\t"; $phage{$f[0]} = $f[3]}
+for (`cat ICE.txt`) {chomp; my @f = split "\t"; $ice{$f[0]} = $f[9]}
 
 my (%uniqIsles, %gnmnames);
 my (%intfams, @outIsles, $lastgnm);
@@ -88,20 +88,16 @@ for (`cat $study`) {
    elsif ($i{ice} eq '2'){$i{type} = 'ICE2'}
    else {$i{type} = 'other'}
  $i{typeok} = $i{type};
- my ($size, $coord) = (0, $i{coord});
- while ($coord =~ s/[^\/]+\/(\d+)-(\d+)//) {
-  $size = abs($2-$1)+1;
- }
- if ($i{crossover} and $i{crossover} >= 300) {
+ if ($i{crossover} >= 300) {
   $i{typeok} = 'Reject';
- } elsif ($size < 5000) {
+ } elsif ((abs($f[3]-$f[4])+1) < 5000) {
   $i{typeok} = 'Reject';
  } elsif (not $i{ints} =~ /Y-Int|S-Int|S-Core_IS607/) {
   $i{typeok} = 'Reject';
  }
- for (qw/supp intLongest compose coord crossover type phage ice source OLL OLR ORL ORR int_site int_site_type trna_dupe tRNA_len qStart qEnd bit_score
+ for (qw/supp intLongest compose coord crossover type phage ice source OLL OLR ORL ORR splice_site splice_site_type trna_dupe tRNA_len qStart qEnd bit_score
   context contextsum isleLseq unintSeq isleRseq gnm dirOnU OL OU OR division phylum order class family
- genus species org ints deltaside len deltaint foreign housekeep hypoth delta_GC dinuc tandem tandem_power tandem_pos idok typeok gnmok db/) {
+ genus species org ints deltaside len deltaint foreign housekeep hypoth delta_GC dinuc idok typeok gnmok db/) {
  #for (qw/len type supp target intsum crossover phage ice gnm OL OU OR species ints intLongest deltaside deltaint tandem invRep tnps isleLseq unintSeq isleRseq/) {
   if (defined $i{$_}) {$outIsles[-1] .= "$_=$i{$_};"} else {$outIsles[-1] .= "$_=;"}
  }

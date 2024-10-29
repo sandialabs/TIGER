@@ -41,8 +41,9 @@ Load_housekeep_enrich();
 chdir $outfolder;
 if ($search eq "IS") {IS()} else {Island()} # calls RunComp(tigercore.pl, ConvertEnds, MobGenes, Annotate, Crossover)
 PrintGff($search); # calls MeanSd, Scores(DeltaInt, HousekeepIndex, HypothIndex, Bias, Foreignness), ResolveOverlaps(intersectBed)
-print STDERR "perl $dir/merge.pl $prefix.$search.gff $search $prefix $nickname";
+#print STDERR "perl $dir/merge.pl $prefix.$search.gff $search $prefix $nickname";
 RunCommand("perl $dir/merge.pl $prefix.$search.gff $search $prefix $nickname", "$prefix.$search.nonoverlap.gff");
+print "Finished!\n";
 
 # SUBROUTINES
 sub StripHeaders {
@@ -141,7 +142,7 @@ sub Island { # run TIGER to find islands
  }
  $ct = scalar(keys %finals); print "$ct calls after ISartifact mode\n";
  PrintGff("ISartifact");
- print STDERR "perl $dir/merge.pl $prefix.ISartifact.gff ISartifact $prefix $nickname";
+ #print STDERR "perl $dir/merge.pl $prefix.ISartifact.gff ISartifact $prefix $nickname";
  RunCommand("perl $dir/merge.pl $prefix.ISartifact.gff ISartifact $prefix $nickname", "$prefix.ISartifact.nonoverlap.gff");
  open IN, "$prefix.ISartifact.nonoverlap.gff";
  while (<IN>) { # Island / IS relationships
@@ -180,7 +181,7 @@ sub Island { # run TIGER to find islands
   }
  }
  close IN;
- print STDERR "blastn -db $dir/../db/is -query $corefiles.fa -outfmt '6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qlen slen";
+ #print STDERR "blastn -db $dir/../db/is -query $corefiles.fa -outfmt '6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qlen slen";
  RunCommand("blastn -db $dir/../db/is -query $corefiles.fa -outfmt '6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qlen slen' > $prefix.IS.blast", "$prefix.IS.blast");
  open IN, "$prefix.IS.blast";
  while (<IN>) { # Same treatment as above for ISFinder matches
@@ -315,8 +316,9 @@ sub PrintGff {
    my ($delta_int, $forn, $hskp, $hypoth, $delta_GC, $dinuc, $overall) = Scores($$final{ints}, $$final{coord}, -1, $$final{len});
    my $out = join("\t", $$final{dna}, 'TIGER', $$final{type}, $$final{L}, $$final{R}, $$final{ct}, $$final{orient}, '.', '');
    $$final{brief} = sprintf('%.0f', $$final{len}/1000) . '.' . $$final{context};
-   $$final{brief} =~ s/\|.{2,3}\|/\|/;
-   $$final{brief} =~ s/[|+]/_/;
+   #$$final{brief} =~ s/\|.{2,3}\|/\|/;
+   #$$final{brief} =~ s/[|+]/_/;
+   $$final{brief} =~ s/\/./_/;
    for (qw/brief coord compose len context flanks flip bitsum gnm crossover int mid side OL OR OU mobQ1 mobQ2 IS ISoverlap transposon ISidentical q1 q2 q1identity q2identity isleLseq unintSeq isleRseq/)
    {die "$_ $$final{L}, $$final{R}\n" unless defined $$final{$_}; $out .= "$_=$$final{$_};"}
    $out .= "mean=$mean;SD=$sd;deltaint=$delta_int;foreign=$forn;housekeep=$hskp;hypoth=$hypoth;delta_GC=$delta_GC;dinuc=$dinuc;FPscore=$overall;project=$prefix;$taxonomy"
@@ -489,6 +491,7 @@ sub log10 {return log(shift)/log(10);}
 
 sub DeltaInt { # Shortest distance between any internal integrase gene end and an island end
  my ($ints, $c, $ret) = @_;
+ $ret = 200000;
  for my $i (0,1) {
   next unless $$c[$i];
   my ($dna, $L, $R) = ($$c[$i]{dna}, sort {$a <=> $b} @{$$c[$i]}{qw/S Ecorr/});
@@ -531,13 +534,13 @@ sub Foreign {
 
 sub Bias {
  my ($c) = @_;
- print STDERR "perl $dir/collectSeq.pl -i $corefiles.fa -e $$c[0]{dna} -L $$c[0]{L} -R $$c[0]{R} >  test.fa";
+ print STDERR "perl $dir/collectSeq.pl -i $corefiles.fa -e $$c[0]{dna} -L $$c[0]{L} -R $$c[0]{R} >  test.fa\n";
  system  "perl $dir/collectSeq.pl -i $corefiles.fa -e $$c[0]{dna} -L $$c[0]{L} -R $$c[0]{R} >  test.fa";
  if ($$c[1]) {
-  print STDERR "perl $dir/collectSeq.pl -i $corefiles.fa -e $$c[1]{dna} -L $$c[1]{L} -R $$c[1]{R} >> test.fa";
+  print STDERR "perl $dir/collectSeq.pl -i $corefiles.fa -e $$c[1]{dna} -L $$c[1]{L} -R $$c[1]{R} >> test.fa\n";
   system "perl $dir/collectSeq.pl -i $corefiles.fa -e $$c[1]{dna} -L $$c[1]{L} -R $$c[1]{R} >> test.fa";
  }
- print STDERR "perl $dir/relAbun.pl test.fa";
+ print STDERR "perl $dir/relAbun.pl test.fa\n";
  my $out = `perl $dir/relAbun.pl test.fa`; chomp $out; $out =~ s/\n.*//s; my @testRA = split "\t", $out;
  my ($delta_GC, $di) = (($testRA[1]-$dnaRA{all}[1])/2, 0);
  for (2,3,4,6,7,9) {$di += abs($testRA[$_]-$dnaRA{all}[$_])}
