@@ -9,8 +9,6 @@
 - [Software Dependencies](#Dependencies)
 - [Installation](#Installation)
 - [Usage Guide](#Usage)
-- [Contributing](#contributing)
-- [License](#license)
 - [Contact](#contact)
 
 
@@ -37,7 +35,8 @@ conda create --name Tiger
 #load your new environment
 conda activate Tiger
 
-#install prokka. Note, prokka has a known bug with conda that you must address by editing its code base. See instructions below.
+# install prokka. Note, prokka has a known bug with conda that you must address by editing its code 
+# base. See instructions below.
 
     conda install -c conda-forge -c bioconda -c defaults prokka
 
@@ -65,7 +64,9 @@ conda activate Tiger
 # download Tiger repository from GitHub
     git clone -b TIGER https://github.com/sandialabs/TIGER.git
 
-# Optional: We recomend adding the path of TIGER/bin to your bash profile to avoid having to call the full program during use. We always advise making a copy of your bash profile before making any edits as a typo may have severe consequences.
+# Optional: We recomend adding the path of TIGER/bin to your bash profile to avoid having to call the
+# full program during use. We always advise making a copy of your bash profile before making any 
+# edits as a typo may have severe consequences.
 
 # ensure the execultables in the TIGER repository have executable permission on your system
     
@@ -76,20 +77,29 @@ conda activate Tiger
     
     conda install anaconda::wget
 
-# get PFAM_A hmm database from NCBI: this is an OLD PFAM database (v35.0) if you want another version, you can change it in the ftp path below (note, this is the version that is suggested to use with TIGER per https://doi.org/10.3389/fbinf.2022.866850). This database must be installed to "Path to Tiger Folder"/db as PFAM-A.hmm
+# get PFAM_A hmm database from NCBI: this is an OLD PFAM database (v35.0) if you want another 
+# version, you can change it in the ftp path below (note, this is the version that is suggested to
+# use with TIGER per https://doi.org/10.3389/fbinf.2022.866850). This database must be installed to 
+# "Path to Tiger Folder"/db as PFAM-A.hmm
 
     wget https://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam35.0/Pfam-A.hmm.gz -o <path to TIGER folder>/db/Pfam-A.hmm.gz
 
-#install gzip if not already available on your system
+# install gzip if not already available on your system
     
     conda install conda-forge::gzip
 
-#uncompress PFAM database:
+# uncompress PFAM database:
 
     gunzip <path to TIGER folder>/db/Pfam-A.hmm.gz
 
 #IMPORTANT: Fix a bug in Prokka:
-# I'm not an author of this program but I've found this bug reported in several forums without an easy solve given. What's happening is that the prokka main script is unable to parse the version number of bioperl that it retrieves with conda correctly (giving the error: Argument "1.7.8" isn't numeric in numeric lt (<)) and thus it exits the program immediately. My "quick and ugly" fix is to hash out the lines in their code that are doing this check. So, in the prokka script (this script should be found at "path to your conda distribution"/envs/"conda env name"/bin/prokka) add a hash (#) to the beginning of lines 256-259 like so:
+# I'm not an author of this program but I've found this bug reported in several forums without an
+# easy solve given. What's happening is that the prokka main script is unable to parse the version
+# number of bioperl that it retrieves with conda correctly (giving the error: Argument "1.7.8" isn't 
+# numeric in numeric lt (<)) and thus it exits the program immediately. My "quick and ugly" fix is to
+# hash out the lines in their code that are doing this check. So, in the prokka script (this script 
+# should be found at "path to your conda distribution"/envs/"conda env name"/bin/prokka) add a hash
+# (#) to the beginning of lines 256-259 like so:
 
     "#my $minbpver = "1.006002"; # for Bio::SearchIO::hmmer3"
     "#my $bpver = $Bio::Root::Version::VERSION;"
@@ -130,3 +140,6 @@ The tab-separated fields of the one-line .tax file are:
 before rerunning islander.pl: ```rm genome.stats```
 
 before rerunning tiger.pl: ```rm genome.island.nonoverlap.gff```
+
+## Contact
+While we're working on a more complete usage guide, please reach out to eltorra@sandia.gov for help if this software is necessary for your research
