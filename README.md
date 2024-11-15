@@ -1,29 +1,110 @@
-# TIGER version 2
-Target / Integrative Genetic Element Retriever, version 2
+# TIGER: Targeted Integrative Genetic Element Retriever
 
-# Citation
-Mageeney CM, Lau BY, Wagner JW, Hudson CM, Schoeniger JS, Krishnakumar R and Williams KP. 2020. New candidates for regulated gene integrity revealed through precise mapping of integrative genetic elements. Nucleic Acids Research 48(8):4052-4065 (doi.org/10.1093/nar/gkaa156)
-Mageeney CM, Trubl G, Williams KP. 2022. Improved mobilome delineation in fragmented genomes. Front Bioinform doi: 10.3389/fbinf.2022.866850
+**Version:** 2  
+**Authors:** Catherine Mageeney, Gary Trubl, Kelly Williams
 
-# INSTALLATION
-git clone -b TIGER2 https://github.com/sandialabs/TIGER.git
 
-User should have a reference genome blast database available, such as refseq_genomic
+## Table of Contents
+- [Citations](#Citations)
+- [Software Dependencies](#Dependencies)
+- [Installation](#Installation)
+- [Usage Guide](#Usage)
+- [Contributing](#contributing)
+- [License](#license)
+- [Contact](#contact)
 
-User should download Pfam-A.hmm from pfam and place it or a symbolic link to it in the TIGERPATH/db directory
 
-```ln -s /ABSOLUTE_PATH/Pfam-A.hmm PATH_TO_TIGER/db/Pfam-A.hmm```
+## Citations
+If you're using this software in a publication, please cite:
+1. Mageeney CM, Trubl G, Williams KP. 2022. Improved mobilome delineation in fragmented genomes. *Front Bioinform* doi: [10.3389/fbinf.2022.866850](https://doi.org/10.3389/fbinf.2022.866850)
+2. Mageeney CM, Lau BY, Wagner JW, Hudson CM, Schoeniger JS, Krishnakumar R, Williams KP. 2020. New candidates for regulated gene integrity revealed through precise mapping of integrative genetic elements. *Nucleic Acids Research* 48(8):4052-4065 (doi: [10.1093/nar/gkaa156](https://doi.org/10.1093/nar/gkaa156))
 
-The following programs (with suggested versions) must be properly installed and in the user's path:
-* blastn, blastdbcmd, makeblastdb 2.6.0+
-* prokka 1.11
-* bedtools 2.27.1
-* tRNAscan-SE 2.0.2
-* cmscan 1.1.2
-* Perl Core: List::Util, File::Spec, Cwd, Getopt::Long
-* Perl Noncore: IPC::Run3
+## Software Dependencies
+TIGER requires the following programs to be available as system-wide executables and has been tested with the following software versions. We reccomend installing these packages and their dependencies using conda (instructions: [Installation](#installation)).
 
-# RUNNING
+- Prokka v1.11 (https://github.com/tseemann/prokka)
+- PfTools v3 (https://github.com/sib-swiss/pftools3)
+- tRNAscan-SE 2.0 (https://github.com/UCSC-LoweLab/tRNAscan-SE)
+- Perl IPC::Run3 
+
+## Installation
+This tutorial recomends that you have a working version of Anaconda or Miniconda (Miniconda is suggested: https://docs.anaconda.com/miniconda/) to properly install all dependencies.
+
+```bash
+#Create a conda environment for Tiger
+conda create --name Tiger
+
+#load your new environment
+conda activate Tiger
+
+#install prokka. Note, prokka has a known bug with conda that you must address by editing its code base. See instructions below.
+
+    conda install -c conda-forge -c bioconda -c defaults prokka
+
+#setup/update prokka databases
+
+    prokka --setupdb
+
+#Install pftools
+
+    conda install bioconda::pftools
+
+#Install tRNA-Scan
+
+    conda install bioconda::trnascan-se
+
+#Install Perl modules
+
+    conda install bioconda::perl-ipc-run3
+
+#Install Git (if not already available on your system)
+
+    conda install anaconda::git
+
+
+# download Tiger repository from GitHub
+    git clone -b TIGER https://github.com/sandialabs/TIGER.git
+
+# Optional: We recomend adding the path of TIGER/bin to your bash profile to avoid having to call the full program during use. We always advise making a copy of your bash profile before making any edits as a typo may have severe consequences.
+
+# ensure the execultables in the TIGER repository have executable permission on your system
+    
+    cd <path to TIGER folder>/bin
+    chmod +x *
+
+#install wget if not available on your system
+    
+    conda install anaconda::wget
+
+# get PFAM_A hmm database from NCBI: this is an OLD PFAM database (v35.0) if you want another version, you can change it in the ftp path below (note, this is the version that is suggested to use with TIGER per https://doi.org/10.3389/fbinf.2022.866850). This database must be installed to "Path to Tiger Folder"/db as PFAM-A.hmm
+
+    wget https://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam35.0/Pfam-A.hmm.gz -o <path to TIGER folder>/db/Pfam-A.hmm.gz
+
+#install gzip if not already available on your system
+    
+    conda install conda-forge::gzip
+
+#uncompress PFAM database:
+
+    gunzip <path to TIGER folder>/db/Pfam-A.hmm.gz
+
+#IMPORTANT: Fix a bug in Prokka:
+# I'm not an author of this program but I've found this bug reported in several forums without an easy solve given. What's happening is that the prokka main script is unable to parse the version number of bioperl that it retrieves with conda correctly (giving the error: Argument "1.7.8" isn't numeric in numeric lt (<)) and thus it exits the program immediately. My "quick and ugly" fix is to hash out the lines in their code that are doing this check. So, in the prokka script (this script should be found at "path to your conda distribution"/envs/"conda env name"/bin/prokka) add a hash (#) to the beginning of lines 256-259 like so:
+
+    "#my $minbpver = "1.006002"; # for Bio::SearchIO::hmmer3"
+    "#my $bpver = $Bio::Root::Version::VERSION;"
+    "#msg("You have BioPerl $bpver");"
+    "#err("Please install BioPerl $minbpver or higher") if $bpver < #$minbpver;"
+
+# We recommend using either nano or vim to make these changes
+
+```
+
+
+## Usage Guide
+We are presently working on a more complete usage guide. Please stay tuned for updates to this section.
+
+
 Requires a .fa file in the same folder with the same prefix.
 You may add a .tax file to specify what the genome is.
 The tab-separated fields of the one-line .tax file are: 
