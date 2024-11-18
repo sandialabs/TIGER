@@ -82,7 +82,7 @@ conda activate Tiger
 # use with TIGER per https://doi.org/10.3389/fbinf.2022.866850). This database must be installed to 
 # "Path to Tiger Folder"/db as PFAM-A.hmm
 
-    wget https://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam35.0/Pfam-A.hmm.gz -o <path to TIGER folder>/db/Pfam-A.hmm.gz>
+    wget https://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam35.0/Pfam-A.hmm.gz -o <path to TIGER folder>/db/Pfam-A.hmm.gz
 
 # install gzip if not already available on your system
     
