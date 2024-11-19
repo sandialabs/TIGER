@@ -27,8 +27,6 @@ To identify genomic islands the Islander software looks for tyrosine integrase g
   <img src=image-1.png />
 </p>
 
-![alt text](image-1.png)
-
 Figure 1. Islander algorithm. (A and B) Population Phase: tRNA and tmRNA genes (tDNAs), tDNA fragments and integrase genes are placed on the chromosome, and each interval between a tDNA and its cognate fragments is considered a candidate island. (C) Filtering Phase: Candidates pass through several filters, including tests for an integrase gene, correct fragment/tDNA orientation and length. (D) Resolution Phase: Multiple candidates at the same tDNA are resolved, identifying tandem arrays when each island in the array has its own tDNA fragment and integrase gene. (c) Hudson CM et. al (2015)
 
 
