@@ -6,6 +6,7 @@
 
 ## Table of Contents
 - [Citations](#Citations)
+- [Software Description](#Description)
 - [Software Dependencies](#Dependencies)
 - [Installation](#Installation)
 - [Usage Guide](#Usage)
@@ -16,6 +17,15 @@
 If you're using this software in a publication, please cite:
 1. Mageeney CM, Trubl G, Williams KP. 2022. Improved mobilome delineation in fragmented genomes. *Front Bioinform* doi: [10.3389/fbinf.2022.866850](https://doi.org/10.3389/fbinf.2022.866850)
 2. Mageeney CM, Lau BY, Wagner JW, Hudson CM, Schoeniger JS, Krishnakumar R, Williams KP. 2020. New candidates for regulated gene integrity revealed through precise mapping of integrative genetic elements. *Nucleic Acids Research* 48(8):4052-4065 (doi: [10.1093/nar/gkaa156](https://doi.org/10.1093/nar/gkaa156))
+3. Hudson CM, Lau BY, Williams KP. 2015. Islander: a database of precisely mapped genomic islands in tRNA and tmRNA genes. *Nucleic Acids Research* V43(D1):D48–D53 (doi: [10.1093/nar/gku1072](https://doi.org/10.1093/nar/gku1072))
+
+## Software Description
+Within this repository are two programs avilable for use: Islander and Tiger. These two programs use different methodology for identifiying putative integrative genetic elements in genomic contigs.
+### Islander
+To identify genomic islands the Islander software looks for tyrosine integrase genes located within either a tmRNA or tRNA. It first identifies tRNA and tmRNAs using tRNAscan-SE (tRNA), BRUCE (tmRNA), and ARAGORN (both). It then identifies nearby integrases (excluding Xer and integron subclasses) using a integrase specific HMM with HMMER3. Using the sequence of the identified tRNA or tmRNA with a nearby integrase, a Blast search is then conducted to search for the cognate end which corresponds to the end of the putative integrated genomic island. 
+![alt text](image-1.png)
+Figure 1. Islander algorithm. (A and B) Population Phase: tRNA and tmRNA genes (tDNAs), tDNA fragments and integrase genes are placed on the chromosome, and each interval between a tDNA and its cognate fragments is considered a candidate island. (C) Filtering Phase: Candidates pass through several filters, including tests for an integrase gene, correct fragment/tDNA orientation and length. (D) Resolution Phase: Multiple candidates at the same tDNA are resolved, identifying tandem arrays when each island in the array has its own tDNA fragment and integrase gene. (c) Hudson CM et. al (2015)
+
 
 ## Software Dependencies
 TIGER requires the following programs to be available as system-wide executables and has been tested with the following software versions. We reccomend installing these packages and their dependencies using conda (instructions: [Installation](#installation)).
@@ -112,8 +122,13 @@ conda activate Tiger
 
 
 ## Usage Guide
-We are presently working on a more complete usage guide. Please stay tuned for updates to this section.
 
+
+# TIGER Requirments:
+
+
+
+![alt text](image.png)
 
 Requires a .fa file in the same folder with the same prefix.
 You may add a .tax file to specify what the genome is.
