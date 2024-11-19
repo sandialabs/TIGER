@@ -20,15 +20,22 @@ If you're using this software in a publication, please cite:
 3. Hudson CM, Lau BY, Williams KP. 2015. Islander: a database of precisely mapped genomic islands in tRNA and tmRNA genes. *Nucleic Acids Research* V43(D1):D48–D53 (doi: [10.1093/nar/gku1072](https://doi.org/10.1093/nar/gku1072))
 
 ## Software Description
-Within this repository are two programs avilable for use: Islander and Tiger. These two programs use different methodology for identifiying putative integrative genetic elements in genomic contigs.
+Within this repository are two programs available for use: Islander and TIGER. These two programs use different methodology for identifiying putative integrative genetic elements in genomic contigs.
 ### Islander
-To identify genomic islands the Islander software looks for tyrosine integrase genes located within either a tmRNA or tRNA. It first identifies tRNA and tmRNAs using tRNAscan-SE (tRNA), BRUCE (tmRNA), and ARAGORN (both). It then identifies nearby integrases (excluding Xer and integron subclasses) using a integrase specific HMM with HMMER3. Using the sequence of the identified tRNA or tmRNA with a nearby integrase, a Blast search is then conducted to search for the cognate end which corresponds to the end of the putative integrated genomic island. 
+To identify genomic islands the Islander software looks for tyrosine integrase genes located within either a tmRNA or tRNA. It first identifies tRNA and tmRNAs using tRNAscan-SE (tRNA), BRUCE (tmRNA), and ARAGORN (both). It then identifies nearby integrases (excluding Xer and integron subclasses) using a integrase specific HMM with HMMER3. Using the sequence of the identified tRNA or tmRNA with a nearby integrase, a BLAST search is then conducted to search for the cognate end which corresponds to the end of the putative integrated genomic island. All candidate islands are then subjected to a series of tests to determine whether they represent true integrate genomic islands (see image below).
 <p align="center">
   <img src=image-1.png />
 </p>
 
-<sub>Figure 1. Islander algorithm. (A and B) Population Phase: tRNA and tmRNA genes (tDNAs), tDNA fragments and integrase genes are placed on the chromosome, and each interval between a tDNA and its cognate fragments is considered a candidate island. (C) Filtering Phase: Candidates pass through several filters, including tests for an integrase gene, correct fragment/tDNA orientation and length. (D) Resolution Phase: Multiple candidates at the same tDNA are resolved, identifying tandem arrays when each island in the array has its own tDNA fragment and integrase gene. (c) Hudson CM et. al (2015)<sub>
+<sub> Graphical Description of the Islander algorithm. (A and B) Population Phase: tRNA and tmRNA genes (tDNAs), tDNA fragments and integrase genes are placed on the chromosome, and each interval between a tDNA and its cognate fragments is considered a candidate island. (C) Filtering Phase: Candidates pass through several filters, including tests for an integrase gene, correct fragment/tDNA orientation and length. (D) Resolution Phase: Multiple candidates at the same tDNA are resolved, identifying tandem arrays when each island in the array has its own tDNA fragment and integrase gene. (Image (c) Hudson CM et. al, 2015)<sub>
 
+### TIGER and TIGER2
+TIGER utilizes the output of Islander for locational data regarding the position of integrase genes including serine integrases. It then uses the sequences 15kb to the left and right of the integrase gene midpoint to query against a BLAST database of species-specific reference genomes to search for query sequences in close proximity which signify the absence of an integrated genetic island and an aproximate attB sequence or, the site of putative island integration. 
+<p align="center">
+  <img src=image-2.png />
+</p>
+
+<sub> Graphical description of TIGER's usage of ping-pong BLAST for integrated genomic element (IGE) discovery. The corresponding regions of an IGE-bearing and uninterrupted reference genome pair (A) produce a sequence alignment pattern (B). Strand crossover presumably occurs with the direct repeat block (yellow). In TIGER (C), the first BLAST simultaneously locates the int-proximal end of the IGE and the attB, and the second locates the distal end of the IGE.<sub>
 
 ## Software Dependencies
 TIGER requires the following programs to be available as system-wide executables and has been tested with the following software versions. We reccomend installing these packages and their dependencies using conda (instructions: [Installation](#installation)).
@@ -125,10 +132,10 @@ conda activate Tiger
 
 
 ## Usage Guide
+### Islander Requirements
 
-
-# TIGER Requirments:
-
+### TIGER Requirments:
+(see https://github.com/sandialabs/SmartDBs for instructions on generating this database. Alternatively, if you only need a database for a single species you can reach out to Kelly Williams (kpwilli at sandia.gov) or Katie Mageeney (cmmagee at sandia.gov) for assisance)
 
 
 ![alt text](image.png)
