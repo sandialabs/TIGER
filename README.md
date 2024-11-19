@@ -23,7 +23,12 @@ If you're using this software in a publication, please cite:
 Within this repository are two programs avilable for use: Islander and Tiger. These two programs use different methodology for identifiying putative integrative genetic elements in genomic contigs.
 ### Islander
 To identify genomic islands the Islander software looks for tyrosine integrase genes located within either a tmRNA or tRNA. It first identifies tRNA and tmRNAs using tRNAscan-SE (tRNA), BRUCE (tmRNA), and ARAGORN (both). It then identifies nearby integrases (excluding Xer and integron subclasses) using a integrase specific HMM with HMMER3. Using the sequence of the identified tRNA or tmRNA with a nearby integrase, a Blast search is then conducted to search for the cognate end which corresponds to the end of the putative integrated genomic island. 
+<p align="center">
+  <img src=image-1.png />
+</p>
+
 ![alt text](image-1.png)
+
 Figure 1. Islander algorithm. (A and B) Population Phase: tRNA and tmRNA genes (tDNAs), tDNA fragments and integrase genes are placed on the chromosome, and each interval between a tDNA and its cognate fragments is considered a candidate island. (C) Filtering Phase: Candidates pass through several filters, including tests for an integrase gene, correct fragment/tDNA orientation and length. (D) Resolution Phase: Multiple candidates at the same tDNA are resolved, identifying tandem arrays when each island in the array has its own tDNA fragment and integrase gene. (c) Hudson CM et. al (2015)
 
 
