@@ -145,6 +145,8 @@ conda activate Tiger
 ### Islander Requirements:
  The only requirment of Islander is an output directory containing a single genomic file in fasta format with a '.fa' subscript.
 
+ ***
+
   **-outDir**:    Output directory. Default: same directory as GENOME_FASTA_FILE.
 
   **-tax**:       Taxonomic info for query genome. Enter file in outDir containing 
@@ -163,8 +165,7 @@ conda activate Tiger
   **-virus**:     Comma-separated list of entries assigned as viruses.
 
   **-complete**:  Consider genome complete and categorize replicons. Default:
-               consider genome incomplete and call all entries contigs.
-
+                consider genome incomplete and call all entries contigs.
   **-force**:     Overwrite current output files. Default: leave existing files.
 
   **-cpu**:       Number of cpus to use. Default: $cpu.
@@ -173,6 +174,7 @@ conda activate Tiger
 
   Additional options: **-help**, **-version**, **-verbose**, **-authors**, **-license**
 
+***
 
 Example:
 
