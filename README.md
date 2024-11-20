@@ -224,4 +224,4 @@ cd <path to out directory containing singular .fa file> ; tiger.pl -verbose -db 
 To rerun this program, delete 'genome.island.nonoverlap.gff'
 
 ## Contact
-While we're working on a more complete usage guide, please reach out to eltorra@sandia.gov for help if this software is necessary for your research
+Please leave an issue on this GitHub repo or reach out to Kelly Williams (kpwilli at sandia dot gov) or Katie Mageeney (cmmagee at sandia dot gov) for questions or assistance.
