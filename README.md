@@ -176,29 +176,52 @@ conda activate Tiger
 ```bash
 cd <path to out directory containing singular .fa file> ; islander.pl -verbose <fasta file name>
 ```
-<sub> Note: if you made the <path to TIGER>/bin a system-wide executable by enabling execute with chmod and adding the path to your bash profile, you will not need to specify perl (perl <path to TIGER>/bin/islander.pl) or use the path to the script in your launch command. If not, you will need to call the program as: ''cd <path to out directory containing singular .fa file> ; perl <path to TIGER>/bin/islander.pl -verbose <fasta file name>''<sub>
+<sub> Note: if you made the "path to TIGER"/bin a system-wide executable by enabling execute with chmod and adding the path to your bash profile, you will not need to specify perl (perl "path to TIGER"/bin/islander.pl) or use the path to the script in your launch command. If not, you will need to call the program as: cd "path to out directory containing singular .fa file" ; perl "path to TIGER"/bin/islander.pl -verbose <fasta file name><sub>
+
+To rerun this program: delete genome.stats
 
 ### TIGER Requirements:
-(see https://github.com/sandialabs/SmartDBs for instructions on generating this database. Alternatively, if you only need a database for a single species you can reach out to Kelly Williams (kpwilli at sandia.gov) or Katie Mageeney (cmmagee at sandia.gov) for assisance)
+TIGER requires a singular genomic or metagenomic file in fasta format ('.fa' subscript) in an output directory and a BLAST database of species specific reference genomes. See https://github.com/sandialabs/SmartDBs for instructions on generating this database. Alternatively, if you only need a BLAST database for a single/few species you can reach out to Kelly Williams (kpwilli at sandia dot gov) or Katie Mageeney (cmmagee at sandia dot gov) for assisance. Please provide the GTDB taxonomic name for your species as well as the link to either a DropBox or GoogleDrive Folder for the database to be deposited in.
 
+***
+*TIGER Flags:*
+Usage: perl tiger.pl [options] -db <RefDatabase> -fasta <GenomicDNA>
+ - '-fasta':    Genomic fasta DNA sequence file.
+ - '-db':   Blast database of reference genomes, absolute path.
+ - '-search':   Search type. Specify island or IS. Default: island.
+ - '-tax':  Taxonomic info for query genome. Enter name of a file containing 
+    NCBI taxonomy string, or use B for Bacteria, A for Archaea, M for 
+    Mycoplasmatales/Entomoplasmatales, G for Gracilibacteria/candidate
+    division SR1. Automatically sets -gencode. Default: B.
+ - '-gencode':  Genetic code table to use (see NCBI). Default: 11.
+ - '-nickname': Brief name for genome (as might be used to start a locus_tag).
+ - '-circle':   Specify C if all genomic DNA sequences are circular, L if all DNAs 
+    are linear, or a filename for a tab-delimited file of query and 
+    circularity (eg. acc.vers[tab]circular/linear). Default: C.
+ - '-cross':    Three options: intact, cross, or circleOrigin. Default: intact. 
+ - '-complete': Consider genome complete and categorize replicons. Default:
+             consider genome incomplete and call all entries contigs.
+ - '-qlen':     Query length for islands. Default: 15000 (3000 is always used
+                in the second pass test for IS's that rule out island artifacts).
+ - '-force':    Overwrite current output files. Default: leave existing files.
+ - '-outDir':   Output directory. Default: same directory as GENOME_FASTA_FILE.
+ - '-cpu':      Number of cpus to use. Default: 1.
+ - Additional options: '-help', '-version', '-verbose', '-authors', '-license'
+***
 
+Executing TIGER Example:
 
-## Sample calls to try within /testdata (PATH: to TIGER installation; DB: to reference genome blast database)
+From your Conda Environment:
+```bash
+conda activate Tiger
+```
 
-```perl PATH/bin/islander.pl -verbose genome.fa &> islander.log```
+```bash
+cd <path to out directory containing singular .fa file> ; tiger.pl -verbose -db <path to reference genome database and database prefix> -fasta <fasta file name>
+```
+<sub> Note: if you made the "path to TIGER"/bin a system-wide executable by enabling execute with chmod and adding the path to your bash profile, you will not need to specify perl (perl "path to TIGER"/bin/tiger.pl) or use the path to the script in your launch command. If not, you will need to call the program as: cd "path to out directory containing singular .fa file" ; perl "path to TIGER"/bin/tiger.pl -verbose -db "path to reference genome database and database prefix" -fasta "fasta file name".
 
-```perl PATH/bin/tiger.pl -verbose -db DB -cross simple -fasta genome.fa &> tiger.log```
-
-```perl PATH/bin/resolve.pl mixed lenient genome genome.island.merge.gff islander.gff &> resolve.log```
-
-```perl PATH/bin/typing.pl resolved.gff &> typing.log```
-
-```perl PATH/bin/typing.pl genome.island.nonoverlap.gff &> typing.log```
-
-## Notes:
-before rerunning islander.pl: ```rm genome.stats```
-
-before rerunning tiger.pl: ```rm genome.island.nonoverlap.gff```
+To rerun this program, delete 'genome.island.nonoverlap.gff'
 
 ## Contact
 While we're working on a more complete usage guide, please reach out to eltorra@sandia.gov for help if this software is necessary for your research
