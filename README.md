@@ -60,6 +60,7 @@ This tutorial recomends that you have a working version of Anaconda or Miniconda
 conda create --name Tiger
 
 #load your new environment
+
 conda activate Tiger
 
 # install prokka. Note, prokka has a known bug with conda that you must address by editing its code 
@@ -87,8 +88,8 @@ conda activate Tiger
 
     conda install anaconda::git
 
-
 # download Tiger repository from GitHub
+
     git clone -b TIGER https://github.com/sandialabs/TIGER.git
 
 # Optional: We recomend adding the path of TIGER/bin to your bash profile to avoid having to call the
@@ -98,6 +99,7 @@ conda activate Tiger
 # ensure the execultables in the TIGER repository have executable permission on your system
     
     cd <path to TIGER folder>/bin
+
     chmod +x *
 
 #install wget if not available on your system
@@ -139,20 +141,44 @@ conda activate Tiger
 
 
 ## Usage Guide
-### Islander Requirements:
 
-### TIGER Requirments:
+### Islander Requirements:
+ The only requirment of Islander is an output directory containing a single genomic file in fasta format with a '.fa' subscript.
+
+  -outDir:    Output directory. Default: same directory as GENOME_FASTA_FILE.
+  -tax:       Taxonomic info for query genome. Enter file in outDir containing 
+               NCBI taxonomy string with a '.tax' subscript, or use B for Bacteria, 
+               A for Archaea, M for Mycoplasmatales/Entomoplasmatales, G for 
+               Gracilibacteria/candidate division SR1. Automatically sets -gencode. 
+               Default: B.
+  -gencode:   Genetic code table (see NCBI). Default: 11
+  -nickname:  Brief name for genome (as might be used to start a locus_tag).
+  -criterion: Basis for overlap resolution, 3 options: random, score (7-test
+               false positive formula), deltaGC. Default = score.
+  -virus:     Comma-separated list of entries assigned as viruses.
+  -complete:  Consider genome complete and categorize replicons. Default:
+               consider genome incomplete and call all entries contigs.
+  -force:     Overwrite current output files. Default: leave existing files.
+  -cpu:       Number of cpus to use. Default: $cpu.
+  -tateronly: Toggle to exit after running tater.pl annotator. Default: off.
+  Additional options: -help, -version, -verbose, -authors, -license
+
+
+Example:
+From your Conda Environment:
+```bash
+conda activate Tiger
+```
+
+```bash
+cd <path to out directory containing singular .fa file> ; <path to TIGER>/bin/islander.pl -verbose <fasta file name>
+```
+<sub> Note: if you made the <path to TIGER>/bin a system-wide executable by enabling execute with chmod and adding the path to your bash profile, you will not need to specify perl (perl <path to TIGER>/bin/islander.pl) or use the path to the script in your launch command. <sub>
+
+### TIGER Requirements:
 (see https://github.com/sandialabs/SmartDBs for instructions on generating this database. Alternatively, if you only need a database for a single species you can reach out to Kelly Williams (kpwilli at sandia.gov) or Katie Mageeney (cmmagee at sandia.gov) for assisance)
 
 
-Requires a .fa file in the same folder with the same prefix.
-You may add a .tax file to specify what the genome is.
-The tab-separated fields of the one-line .tax file are: 
- 1. taxid
- 2. organism
- 3. Division;Phylum;Class;Order;Family;Genus;Species
- 4. Genetic code (see https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi)
- 5. Nickname (short name for organism, eg Eco837 for the 837th E. coli genome)
 
 ## Sample calls to try within /testdata (PATH: to TIGER installation; DB: to reference genome blast database)
 
