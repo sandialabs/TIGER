@@ -27,7 +27,7 @@ To identify genomic islands the Islander software looks for tyrosine integrase g
   <img src=image-1.png />
 </p>
 
-<sub> Graphical Description of the Islander algorithm. (A and B) Population Phase: tRNA and tmRNA genes (tDNAs), tDNA fragments and integrase genes are placed on the chromosome, and each interval between a tDNA and its cognate fragments is considered a candidate island. (C) Filtering Phase: Candidates pass through several filters, including tests for an integrase gene, correct fragment/tDNA orientation and length. (D) Resolution Phase: Multiple candidates at the same tDNA are resolved, identifying tandem arrays when each island in the array has its own tDNA fragment and integrase gene. (Image (c) Hudson CM et. al, 2015)<sub>
+<sub> Graphical Description of the Islander algorithm. (A and B) Population Phase: tRNA and tmRNA genes (tDNAs), tDNA fragments and integrase genes are placed on the chromosome, and each interval between a tDNA and its cognate fragments is considered a candidate island. (C) Filtering Phase: Candidates pass through several filters, including tests for an integrase gene, correct fragment/tDNA orientation and length. (D) Resolution Phase: Multiple candidates at the same tDNA are resolved, identifying tandem arrays when each island in the array has its own tDNA fragment and integrase gene. (Image (c) CM Hudson et. al, 2015)<sub>
 
 ### TIGER and TIGER2
 TIGER utilizes the output of Islander for locational data regarding the position of integrase genes including serine integrases. It then uses the sequences 15kb to the left and right of the integrase gene midpoint to query against a BLAST database of species-specific reference genomes to search for query sequences in close proximity which signify the absence of an integrated genetic island and an aproximate attB sequence or, the site of putative island integration. 
@@ -35,7 +35,14 @@ TIGER utilizes the output of Islander for locational data regarding the position
   <img src=image-2.png />
 </p>
 
-<sub> Graphical description of TIGER's usage of ping-pong BLAST for integrated genomic element (IGE) discovery. The corresponding regions of an IGE-bearing and uninterrupted reference genome pair (A) produce a sequence alignment pattern (B). Strand crossover presumably occurs with the direct repeat block (yellow). In TIGER (C), the first BLAST simultaneously locates the int-proximal end of the IGE and the attB, and the second locates the distal end of the IGE.<sub>
+<sub> Graphical description of TIGER's usage of ping-pong BLAST for integrated genetic element (IGE) discovery. The corresponding regions of an IGE-bearing and uninterrupted reference genome pair (A) produce a sequence alignment pattern (B). Strand crossover presumably occurs with the direct repeat block (yellow). In TIGER (C), the first BLAST simultaneously locates the int-proximal end of the IGE and the attB, and the second locates the distal end of the IGE. (Image (c) CM Mageeney et. al, 2020)<sub>
+
+TIGER2 improves on TIGER by enabling integrated genomic element identification in cases where the whole putative island sequence is not present on a singular scaffold/contig. Ultimately, the TIGER2 update introduses two new “split” modes that yield split GIs, in addition to the intact GIs (Figure 1). “CircleOrigin” mode finds split GIs that wrap around the origin of a circular replicon. “Cross” mode detects split GIs with termini on separate scaffolds. 
+<p align="center">
+  <img src=image-3.png />
+</p>
+
+<sub> Graphical Demonstration of Fragmented Islands which Can be Identified with Tiger2. The same circular chromosome with 3 (colored) GIs is shown with a complete (A,B) or fragmented assembly (C). With complete assembly, if the origin of the linearized sequence of the circle is randomly chosen, it will occasionally fall within a GI, splitting the GI (B). Yields are shown for the various TIGER modes. The original mode can only find intact GIs on a single scaffold, while the new modes, CircleOrigin (applied to complete assemblies) and Cross (applied to fragmented assemblies), can additionally find the split islands. Because TIGER focuses on GI-flanking sequences, the Cross-mode call for a multiply split GI (red in panel C) will only include the terminal fragments and exclude middle GI fragments. (Image (c) CM Mageeney et. al, 2022)<sub>
 
 ## Software Dependencies
 TIGER requires the following programs to be available as system-wide executables and has been tested with the following software versions. We reccomend installing these packages and their dependencies using conda (instructions: [Installation](#installation)).
@@ -132,13 +139,11 @@ conda activate Tiger
 
 
 ## Usage Guide
-### Islander Requirements
+### Islander Requirements:
 
 ### TIGER Requirments:
 (see https://github.com/sandialabs/SmartDBs for instructions on generating this database. Alternatively, if you only need a database for a single species you can reach out to Kelly Williams (kpwilli at sandia.gov) or Katie Mageeney (cmmagee at sandia.gov) for assisance)
 
-
-![alt text](image.png)
 
 Requires a .fa file in the same folder with the same prefix.
 You may add a .tax file to specify what the genome is.
