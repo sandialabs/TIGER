@@ -37,7 +37,7 @@ TIGER utilizes the output of Islander for locational data regarding the position
 
 <sub> Graphical description of TIGER's usage of ping-pong BLAST for integrated genetic element (IGE) discovery. The corresponding regions of an IGE-bearing and uninterrupted reference genome pair (A) produce a sequence alignment pattern (B). Strand crossover presumably occurs with the direct repeat block (yellow). In TIGER (C), the first BLAST simultaneously locates the int-proximal end of the IGE and the attB, and the second locates the distal end of the IGE. (Image (c) CM Mageeney et. al, 2020)<sub>
 
-TIGER2 improves on TIGER by enabling integrated genomic element identification in cases where the whole putative island sequence is not present on a singular scaffold/contig. Ultimately, the TIGER2 update introduses two new “split” modes that yield split GIs, in addition to the intact GIs (Figure 1). “CircleOrigin” mode finds split GIs that wrap around the origin of a circular replicon. “Cross” mode detects split GIs with termini on separate scaffolds. 
+TIGER2 improves on TIGER by enabling integrated genomic element identification in cases where the whole putative island sequence is not present on a singular scaffold/contig. Ultimately, the TIGER2 update introduces two new “split” modes that yield split GIs, in addition to the intact GIs. “CircleOrigin” mode finds split GIs that wrap around the origin of a circular replicon. “Cross” mode detects split GIs with termini on separate scaffolds. 
 <p align="center">
   <img src=image-3.png />
 </p>
