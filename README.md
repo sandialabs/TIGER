@@ -174,9 +174,9 @@ conda activate Tiger
 ```
 
 ```bash
-cd <path to out directory containing singular .fa file> ; <path to TIGER>/bin/islander.pl -verbose <fasta file name>
+cd <path to out directory containing singular .fa file> ; islander.pl -verbose <fasta file name>
 ```
-<sub> Note: if you made the <path to TIGER>/bin a system-wide executable by enabling execute with chmod and adding the path to your bash profile, you will not need to specify perl (perl <path to TIGER>/bin/islander.pl) or use the path to the script in your launch command. <sub>
+<sub> Note: if you made the <path to TIGER>/bin a system-wide executable by enabling execute with chmod and adding the path to your bash profile, you will not need to specify perl (perl <path to TIGER>/bin/islander.pl) or use the path to the script in your launch command. If not, you will need to call the program as: ''cd <path to out directory containing singular .fa file> ; perl <path to TIGER>/bin/islander.pl -verbose <fasta file name>''<sub>
 
 ### TIGER Requirements:
 (see https://github.com/sandialabs/SmartDBs for instructions on generating this database. Alternatively, if you only need a database for a single species you can reach out to Kelly Williams (kpwilli at sandia.gov) or Katie Mageeney (cmmagee at sandia.gov) for assisance)
