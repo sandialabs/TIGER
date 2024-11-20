@@ -9,7 +9,7 @@
 - [Software Description](#Description)
 - [Software Dependencies](#Dependencies)
 - [Installation](#Installation)
-- [Usage Guide](#Usage)
+- [Usage Guide](#Guide)
 - [Contact](#contact)
 
 
@@ -185,7 +185,6 @@ TIGER requires a singular genomic or metagenomic file in fasta format ('.fa' sub
 
 ***
 *TIGER Flags:*
-Usage: perl tiger.pl [options] -db <RefDatabase> -fasta <GenomicDNA>
  - '-fasta':    Genomic fasta DNA sequence file.
  - '-db':   Blast database of reference genomes, absolute path.
  - '-search':   Search type. Specify island or IS. Default: island.
