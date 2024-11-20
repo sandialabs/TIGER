@@ -145,34 +145,34 @@ conda activate Tiger
 ### Islander Requirements:
  The only requirment of Islander is an output directory containing a single genomic file in fasta format with a '.fa' subscript.
 
+*Islander Flags*
  ***
+  '-outDir':    Output directory. Default: same directory as GENOME_FASTA_FILE.
 
-  **-outDir**:    Output directory. Default: same directory as GENOME_FASTA_FILE.
-
-  **-tax**:       Taxonomic info for query genome. Enter file in outDir containing 
+  '-tax':       Taxonomic info for query genome. Enter file in outDir containing 
                NCBI taxonomy string with a '.tax' subscript, or use B for Bacteria, 
                A for Archaea, M for Mycoplasmatales/Entomoplasmatales, G for 
                Gracilibacteria/candidate division SR1. Automatically sets -gencode. 
                Default: B.
 
-  **-gencode**:   Genetic code table (see NCBI). Default: 11
+  '-gencode':   Genetic code table (see NCBI). Default: 11
 
-  **-nickname**:  Brief name for genome (as might be used to start a locus_tag).
+  '-nickname':  Brief name for genome (as might be used to start a locus_tag).
 
-  **-criterion**: Basis for overlap resolution, 3 options: random, score (7-test
+  '-criterion': Basis for overlap resolution, 3 options: random, score (7-test
                false positive formula), deltaGC. Default = score.
 
-  **-virus**:     Comma-separated list of entries assigned as viruses.
+  '-virus':     Comma-separated list of entries assigned as viruses.
 
-  **-complete**:  Consider genome complete and categorize replicons. Default:
+  '-complete':  Consider genome complete and categorize replicons. Default:
                 consider genome incomplete and call all entries contigs.
-  **-force**:     Overwrite current output files. Default: leave existing files.
+  '-force':     Overwrite current output files. Default: leave existing files.
 
-  **-cpu**:       Number of cpus to use. Default: $cpu.
+  '-cpu':       Number of cpus to use. Default: $cpu.
 
-  **-tateronly**: Toggle to exit after running tater.pl annotator. Default: off.
+  '-tateronly': Toggle to exit after running tater.pl annotator. Default: off.
 
-  Additional options: **-help**, **-version**, **-verbose**, **-authors**, **-license**
+  Additional options: '-help', '-version', '-verbose', '-authors', '-license'
 
 ***
 
