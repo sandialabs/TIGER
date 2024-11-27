@@ -90,7 +90,7 @@ conda activate Tiger
 
 # download Tiger repository from GitHub
 
-    git clone -b TIGER https://github.com/sandialabs/TIGER.git
+    git clone https://github.com/sandialabs/TIGER.git
 
 # Optional: We recomend adding the path of TIGER/bin to your bash profile to avoid having to call the
 # full program during use. We always advise making a copy of your bash profile before making any 
