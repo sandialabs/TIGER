@@ -161,7 +161,7 @@ conda activate Tiger
  - '-complete':  Consider genome complete and categorize replicons. Default:
                 consider genome incomplete and call all entries contigs.
  - '-force':     Overwrite current output files. Default: leave existing files.
- - '-cpu':       Number of cpus to use. Default: $cpu.
+ - '-cpu':       Number of cpus to use. Default: 2.
  - '-tateronly': Toggle to exit after running tater.pl annotator. Default: off.
  - Additional options: '-help', '-version', '-verbose', '-authors', '-license'
 ***
