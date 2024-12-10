@@ -242,7 +242,7 @@ cd <path to out directory containing resolve output>; typing.pl resolve3.gff
 
 
 
-##Output files
+## Output files
 There are numerous output files generated from TIGER and Islander pipeline. Many of these are only needed if you plan to rerun the software. This guide will describe the 4 main output files
 
 TIGER
