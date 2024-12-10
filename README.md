@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/9b5f619d-3ced-4010-bb8b-d311581fcad0)# TIGER: Targeted Integrative Genetic Element Retriever
+# TIGER: Targeted Integrative Genetic Element Retriever
 
 **Version:** 2  
 **Authors and Contributors:** Catherine Mageeney, Corey Hudson, Steven Yu, Ellis Torrance, Kelly Williams
