@@ -107,12 +107,12 @@ conda activate Tiger
     
     conda install anaconda::wget
 
-# get PFAM_A hmm database from NCBI: this is an OLD PFAM database (v35.0) if you want another 
+# get PFAM_A hmm database from NCBI: this is an OLD PFAM database (v25.0) if you want another 
 # version, you can change it in the ftp path below (note, this is the version that is suggested to
 # use with TIGER per https://doi.org/10.3389/fbinf.2022.866850). This database must be installed to 
 # "Path to Tiger Folder"/db as PFAM-A.hmm
 
-    wget https://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam35.0/Pfam-A.hmm.gz -o <path to TIGER folder>/db/Pfam-A.hmm.gz
+    wget https://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam25.0/Pfam-A.hmm.gz -o <path to TIGER folder>/db/Pfam-A.hmm.gz
 
 # install gzip if not already available on your system
     
