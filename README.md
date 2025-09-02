@@ -243,8 +243,18 @@ cd <path to out directory containing resolve output>; typing.pl resolve3.gff
 ### Optional ReadStepper: Examining the flank of a query sequence in readset data
  
 ReadStepper is a simple grep-trim-sort algorithm that allows the user to examine how raw short (eg. Illumina) sequencing reads inform a given flank of a query sequence. This is useful for examining challenging regions of an assembly, for example at repetitive regions or the closure of a circular contig. The user inputs a short query sequence (a 20-mer is usually adequate) and one or more paths to a fastq file. By default the downstream flank of the query is examined, but this can be switched to the upstream flank. The first step is to grep for the query sequence and its reverse complement among the reads, orienting all hit read sequences to the sense of the query. The second step is trim the query sequence and its unexamined flank from all reads. Then query-flanking sequences are alphabetically sorted. If the flanking sequence is single-copy, the sorted sequences should form a single horn with some noise due to occasional sequence errors. If the query sequence is from a repetitive sequence with two different right flanks, two horns will be produced (as in Fig. S1 of the reference).
- 
+
 Reference: Hudson CM, Bent ZW, Meagher RJ, Williams KP. 2014. Resistance determinants and mobile genetic elements of an NDM-1 encoding Klebsiella pneumoniae strain. PLoS One 9:e99209
+
+Usage:
+```
+perl readstepper.pl -q query_seqence seqencing_read_file
+```
+optional arguments:
+-f flank to extend: l=left r=right
+-s suppress extensions below this length
+-c case of read sequence: u=upper-case, l=lower-case
+
  
 
 ## Output files
